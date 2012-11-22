@@ -57,7 +57,7 @@ public class SSSserver {
 		bootstrap.setPipelineFactory(new HttpServerPipelineFactory());
 
 		// Bind and start to accept incoming connections.
-		bootstrap.bind(new InetSocketAddress(8080));
+		bootstrap.bind(new InetSocketAddress(80));
 		
 		
 		System.out.println("Setting up dq2 environment ...");

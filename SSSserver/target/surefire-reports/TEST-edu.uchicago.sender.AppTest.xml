@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="0.01" errors="0" skipped="0" tests="1" name="edu.uchicago.sender.AppTest">
+<testsuite failures="0" time="0.011" errors="0" skipped="0" tests="1" name="edu.uchicago.sender.AppTest">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_09.jdk/Contents/Home/jre/lib"/>
@@ -20,7 +20,7 @@
     <property name="basedir" value="/Users/ivukotic/work/workspace/SSS/SSSserver"/>
     <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_09.jdk/Contents/Home/jre/lib/endorsed"/>
     <property name="os.arch" value="x86_64"/>
-    <property name="surefire.real.class.path" value="/Users/ivukotic/work/workspace/SSS/SSSserver/target/surefire/surefirebooter534119031783300728.jar"/>
+    <property name="surefire.real.class.path" value="/Users/ivukotic/work/workspace/SSS/SSSserver/target/surefire/surefirebooter8506504700391786431.jar"/>
     <property name="java.io.tmpdir" value="/var/folders/cp/yvx0qm0517b97rv01wdcz_780000gn/T/"/>
     <property name="line.separator" value="
 "/>
@@ -44,7 +44,7 @@
     <property name="java.vm.specification.version" value="1.7"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_09.jdk/Contents/Home/jre"/>
-    <property name="sun.java.command" value="/Users/ivukotic/work/workspace/SSS/SSSserver/target/surefire/surefirebooter534119031783300728.jar /Users/ivukotic/work/workspace/SSS/SSSserver/target/surefire/surefire3907505254143793352tmp /Users/ivukotic/work/workspace/SSS/SSSserver/target/surefire/surefire1474587802356996457tmp"/>
+    <property name="sun.java.command" value="/Users/ivukotic/work/workspace/SSS/SSSserver/target/surefire/surefirebooter8506504700391786431.jar /Users/ivukotic/work/workspace/SSS/SSSserver/target/surefire/surefire3199338614736203316tmp /Users/ivukotic/work/workspace/SSS/SSSserver/target/surefire/surefire3984530673757222022tmp"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="en"/>
     <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
