@@ -39,6 +39,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+    	System.out.println("MessageReceived.");
         if (!readingChunks) {
             HttpRequest request = this.request = (HttpRequest) e.getMessage();
 
