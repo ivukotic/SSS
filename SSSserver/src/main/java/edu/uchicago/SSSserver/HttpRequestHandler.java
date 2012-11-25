@@ -90,7 +90,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
             
             String ds=scb.toString(UTF8_CHARSET);
             String [] r=ds.split("=");
-            if (r[0]=="inds"){
+            if (r[0].equals("inds")){
             	String [] dss=r[1].split(",");
             	for (String d : dss){
             		queryDQ2(d);
@@ -101,7 +101,11 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
                 send100Continue(e);
             }
 
+            
             buf.setLength(0);
+            for (Dataset das:dSets){
+            	buf.append("size="+String.valueOf(das.size)+"\r\n");
+            }
             buf.append("WELCOME TO THE WILD WILD WEB SERVER\r\n");
             buf.append("===================================\r\n");
 
