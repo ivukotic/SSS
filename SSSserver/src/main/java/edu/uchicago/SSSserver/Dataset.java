@@ -10,16 +10,16 @@ public class Dataset {
 	final Logger logger = LoggerFactory.getLogger(Dataset.class);
 	
 	public String name;
-	public int size;
-	public int events;
+	public long size;
+	public long events;
 	public ArrayList<RootFile> alRootFiles;
 	
 	public class RootFile{
 		public String name;
 		public String guid;
-		public int si;
-		public int events;
-		RootFile(String na, String gu, int si){
+		public long si;
+		public long events;
+		RootFile(String na, String gu, long si){
 			name=na; guid=gu; size=si;
 		}
 	}
@@ -28,7 +28,7 @@ public class Dataset {
 		name=na;
 		alRootFiles=new ArrayList<RootFile>();
 	}
-	public void addFile(String na, String gu, int si){
+	public void addFile(String na, String gu, long si){
 		alRootFiles.add(new RootFile(na, gu, si));
 		logger.info("adding file: "+na+"\tGUID: "+gu+"\t bytes: "+si);
 		size+=si;

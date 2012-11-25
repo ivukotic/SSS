@@ -49,20 +49,23 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
     
     public void queryDQ2(String ds){
     	try {
+
+            Dataset dSet=new Dataset(ds);
+            
             Runtime rt = Runtime.getRuntime();
-            Process pr = rt.exec("dq2-ls -f "+ds);
+            String comm="dq2-ls -f "+ds;
+            logger.info("executing >"+comm+"<");
+            Process pr = rt.exec(comm);
 
             BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 
             String line=null;
-            Dataset dSet=new Dataset(ds);
-            
             while((line=input.readLine()) != null) {
             	if (line.indexOf(".root")>0){
             		logger.info(line);
             		String [] r=line.split("\t");
             		if (r.length==5)
-            			dSet.addFile(r[1],r[2],Integer.parseInt(r[4]));
+            			dSet.addFile(r[1],r[2],Long.parseLong(r[4]));
                 }
             }
 
@@ -85,8 +88,10 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
             SlicedChannelBuffer scb = (SlicedChannelBuffer) request.getContent();
             logger.info("content: "+ scb.toString(UTF8_CHARSET));
             
-            String ds="scb.toString(UTF8_CHARSET)";
-            queryDQ2(ds);
+            String ds=scb.toString(UTF8_CHARSET);
+            String r[]=ds.split("=");
+            if (r[0]=="inds")
+            	queryDQ2(r[1]);
             
             if (is100ContinueExpected(request)) {
                 send100Continue(e);
