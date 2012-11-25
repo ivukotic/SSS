@@ -7,6 +7,7 @@ import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.buffer.SlicedChannelBuffer;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -36,7 +38,8 @@ import org.slf4j.LoggerFactory;
 
 
 public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
-
+	
+	private final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 	final Logger logger = LoggerFactory.getLogger(HttpRequestHandler.class);
     private HttpRequest request;
     private boolean readingChunks;
@@ -76,10 +79,15 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
     
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-    	System.out.println("MessageReceived.");
+    	logger.info("MessageReceived.");
         if (!readingChunks) {
             HttpRequest request = this.request = (HttpRequest) e.getMessage();
-
+            SlicedChannelBuffer scb = (SlicedChannelBuffer) request.getContent();
+            logger.info("content: "+ scb.toString(UTF8_CHARSET));
+            
+            String ds="scb.toString(UTF8_CHARSET)";
+            queryDQ2(ds);
+            
             if (is100ContinueExpected(request)) {
                 send100Continue(e);
             }
