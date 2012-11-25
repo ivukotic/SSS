@@ -5,6 +5,9 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
 import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,15 +31,49 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.jboss.netty.util.CharsetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
+	final Logger logger = LoggerFactory.getLogger(HttpRequestHandler.class);
     private HttpRequest request;
     private boolean readingChunks;
     /** Buffer that stores the response content */
     private final StringBuilder buf = new StringBuilder();
+    private ArrayList<Dataset> dSets=new ArrayList<Dataset>();
+    
+    public void queryDQ2(String ds){
+    	try {
+            Runtime rt = Runtime.getRuntime();
+            Process pr = rt.exec("dq2-ls -f "+ds);
 
+            BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+
+            String line=null;
+            Dataset dSet=new Dataset(ds);
+            
+            while((line=input.readLine()) != null) {
+            	if (line.indexOf(".root")>0){
+            		logger.info(line);
+            		String [] r=line.split("\t");
+            		if (r.length==5)
+            			dSet.addFile(r[1],r[2],Integer.parseInt(r[4]));
+                }
+            }
+
+            int exitVal = pr.waitFor();
+            logger.info("Exited with code "+exitVal);
+            if (exitVal==0) dSets.add(dSet);
+            
+        } catch(Exception e) {
+            logger.error(e.toString());
+            e.printStackTrace();
+        }
+    	
+    }
+    
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     	System.out.println("MessageReceived.");
