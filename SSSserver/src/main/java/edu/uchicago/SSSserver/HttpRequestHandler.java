@@ -89,9 +89,13 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
             logger.info("content: "+ scb.toString(UTF8_CHARSET));
             
             String ds=scb.toString(UTF8_CHARSET);
-            String r[]=ds.split("=");
-            if (r[0]=="inds")
-            	queryDQ2(r[1]);
+            String [] r=ds.split("=");
+            if (r[0]=="inds"){
+            	String [] dss=r[1].split(",");
+            	for (String d : dss){
+            		queryDQ2(d);
+            	}
+            }
             
             if (is100ContinueExpected(request)) {
                 send100Continue(e);
