@@ -30,7 +30,7 @@ public class Dataset {
 	}
 	public void addFile(String na, String gu, long si){
 		alRootFiles.add(new RootFile(na, gu, si));
-		logger.info("adding file: "+na+"\tGUID: "+gu+"\t bytes: "+si);
+		logger.debug("adding file: "+na+"\tGUID: "+gu+"\t bytes: "+si);
 		size+=si;
 	}
 }

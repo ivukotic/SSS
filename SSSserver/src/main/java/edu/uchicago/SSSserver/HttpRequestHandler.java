@@ -62,7 +62,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
             String line=null;
             while((line=input.readLine()) != null) {
             	if (line.indexOf(".root")>0){
-            		logger.info(line);
+            		logger.debug(line);
             		String [] r=line.split("\t");
             		if (r.length==5)
             			dSet.addFile(r[1],r[2],Long.parseLong(r[4]));
@@ -104,39 +104,36 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
             
             buf.setLength(0);
             for (Dataset das:dSets){
-            	buf.append("size="+String.valueOf(das.size)+"\r\n");
+            	buf.append("size:"+String.valueOf(das.size)+"\r\n");
             }
-            buf.append("WELCOME TO THE WILD WILD WEB SERVER\r\n");
-            buf.append("===================================\r\n");
 
-            buf.append("VERSION: " + request.getProtocolVersion() + "\r\n");
-            buf.append("HOSTNAME: " + getHost(request, "unknown") + "\r\n");
-            buf.append("REQUEST_URI: " + request.getUri() + "\r\n\r\n");
-
-            for (Map.Entry<String, String> h: request.getHeaders()) {
-                buf.append("HEADER: " + h.getKey() + " = " + h.getValue() + "\r\n");
-            }
-            buf.append("\r\n");
-
-            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
-            Map<String, List<String>> params = queryStringDecoder.getParameters();
-            if (!params.isEmpty()) {
-                for (Entry<String, List<String>> p: params.entrySet()) {
-                    String key = p.getKey();
-                    List<String> vals = p.getValue();
-                    for (String val : vals) {
-                        buf.append("PARAM: " + key + " = " + val + "\r\n");
-                    }
-                }
-                buf.append("\r\n");
-            }
+//            buf.append("VERSION: " + request.getProtocolVersion() + "\r\n");
+//            buf.append("HOSTNAME: " + getHost(request, "unknown") + "\r\n");
+//            buf.append("REQUEST_URI: " + request.getUri() + "\r\n\r\n");
+//            for (Map.Entry<String, String> h: request.getHeaders()) {
+//                buf.append("HEADER: " + h.getKey() + " = " + h.getValue() + "\r\n");
+//            }
+//            buf.append("\r\n");
+//
+//            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.getUri());
+//            Map<String, List<String>> params = queryStringDecoder.getParameters();
+//            if (!params.isEmpty()) {
+//                for (Entry<String, List<String>> p: params.entrySet()) {
+//                    String key = p.getKey();
+//                    List<String> vals = p.getValue();
+//                    for (String val : vals) {
+//                        buf.append("PARAM: " + key + " = " + val + "\r\n");
+//                    }
+//                }
+//                buf.append("\r\n");
+//            }
 
             if (request.isChunked()) {
                 readingChunks = true;
             } else {
                 ChannelBuffer content = request.getContent();
                 if (content.readable()) {
-                    buf.append("CONTENT: " + content.toString(CharsetUtil.UTF_8) + "\r\n");
+//                    buf.append("CONTENT: " + content.toString(CharsetUtil.UTF_8) + "\r\n");
                 }
                 writeResponse(e);
             }
