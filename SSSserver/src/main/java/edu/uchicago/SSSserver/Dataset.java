@@ -10,6 +10,7 @@ public class Dataset {
 	final Logger logger = LoggerFactory.getLogger(Dataset.class);
 	
 	public String name;
+	public String gLFNpath;
 	public long size;
 	public long events;
 	public ArrayList<RootFile> alRootFiles;
@@ -28,6 +29,11 @@ public class Dataset {
 		name=na;
 		alRootFiles=new ArrayList<RootFile>();
 	}
+	
+	public void setPath(String pat){
+		gLFNpath=pat;
+	}
+	
 	public void addFile(String na, String gu, long si){
 		alRootFiles.add(new RootFile(na, gu, si));
 		logger.debug("adding file: "+na+"\tGUID: "+gu+"\t bytes: "+si);

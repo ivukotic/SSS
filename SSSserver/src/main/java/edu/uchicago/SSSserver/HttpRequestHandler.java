@@ -29,6 +29,8 @@ import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.uchicago.SSSserver.Dataset.RootFile;
+
 public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 	private final Charset UTF8_CHARSET = Charset.forName("UTF-8");
@@ -39,6 +41,31 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	private StringBuilder buf = new StringBuilder();
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
 
+	public String runInspector(){
+		String res="";
+		for (Dataset ds: dSets){
+			try {
+				for (RootFile rf:ds.alRootFiles){
+					Runtime rt = Runtime.getRuntime();
+					String comm = "./inspector " + ds.gLFNpath+"/"+rf.name;
+					logger.info("executing >" + comm + "<");
+					Process pr = rt.exec(comm);
+					BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+
+					String line = null;
+					while ((line = input.readLine()) != null) {
+						logger.info(line);
+						res+=line+"\n";
+					}
+				}
+			} catch (Exception e) {
+				logger.error(e.toString());
+				e.printStackTrace();
+			}
+		}
+		return res;
+	}
+	
 	public void queryDQ2(String ds) {
 		try {
 			Dataset dSet = new Dataset(ds);
@@ -65,11 +92,28 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			if (exitVal == 0)
 				dSets.add(dSet);
 
+			// get gLFN path 
+			comm = "dq2-list-files -p " + ds;
+			logger.info("executing >" + comm + "<");
+			Process pr1 = rt.exec(comm);
+			BufferedReader input1 = new BufferedReader(new InputStreamReader(pr1.getInputStream()));
+			line=null;
+			if ((line = input1.readLine()) != null){
+				logger.info(line);
+				line=line.substring(0,line.lastIndexOf("/"));
+				logger.info(line);
+			}
+			exitVal = pr1.waitFor();
+			logger.info("Exited with code " + exitVal);
+			
+			if (exitVal == 0)
+				dSet.setPath(line);
+
 		} catch (Exception e) {
 			logger.error(e.toString());
 			e.printStackTrace();
 		}
-
+		
 	}
 
 	@Override
@@ -101,8 +145,9 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			}
 
 			buf.setLength(0);
-			buf.append("size:" + String.valueOf(totsize));
-
+			buf.append("size:" + String.valueOf(totsize)+"\n");
+			buf.append(runInspector());
+			
 			if (request.isChunked()) {
 				readingChunks = true;
 			} else {
