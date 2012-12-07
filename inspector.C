@@ -65,10 +65,13 @@ int main(int argc, char **argv){
         TObject *obj = key->ReadObj();
         if ( obj->IsA()->InheritsFrom( "TTree" ) ) {
             TTree *tree = (TTree*)f->Get(obj->GetName());
-            m_trees.push_back(mTree(tree));
+            int exist=0;
+            for(vector<mTree>::iterator i=m_trees.begin();i!=m_trees.end();i++)
+                if (obj->GetName()==(*i).name) exist=1;
+            if (!exist) m_trees.push_back(mTree(tree));
         }
     }
-    
+    cout<<m_trees.size()<<endl;
     for (vector<mTree>::iterator it = m_trees.begin();it != m_trees.end(); it++)
         it->print();
 f->Close();        
