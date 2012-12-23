@@ -54,7 +54,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 					String line = null;
 					while ((line = input.readLine()) != null) {
-						logger.info(line);
+						logger.debug(line);
 						res+=line+"\n";
 					}
 				}
@@ -126,9 +126,18 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			SlicedChannelBuffer scb = (SlicedChannelBuffer) request.getContent();
 			logger.info("content: " + scb.toString(UTF8_CHARSET));
 			
+			Integer step=-1;
 			String ds = scb.toString(UTF8_CHARSET);
-			String[] r = ds.split("=");
-			if (r[0].equals("inds")) {
+			String[] pars = ds.split("&");
+			String sStep=pars[0];
+			String[] sSplit=sStep.split("=");
+			if (sSplit[0].equals("step")){
+				step=Integer.parseInt(sSplit[1]);
+			} else return;
+			logger.info("step: "+step.toString());
+			
+			String[] r = pars[1].split("=");
+			if (step==0 && r[0].equals("inds")) {
 				String[] dss = r[1].split(",");
 				for (String d : dss) {
 					queryDQ2(d);
@@ -162,7 +171,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 		// Build the response object.
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-		System.out.println("returns:" + buf.toString());
+		logger.info("returns:\n" + buf.toString());
 		response.setContent(ChannelBuffers.copiedBuffer(buf, CharsetUtil.UTF_8));
 		
 		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");

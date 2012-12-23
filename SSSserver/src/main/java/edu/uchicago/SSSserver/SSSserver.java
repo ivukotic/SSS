@@ -5,9 +5,13 @@ import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SSSserver {
 
+
+	final static Logger logger = LoggerFactory.getLogger(SSSserver.class);
 
 	SSSserver() {
 	}
@@ -45,9 +49,8 @@ public class SSSserver {
 //		f.releaseExternalResources();
 //	}
 
-
 	public static void main(String[] args) {
-		System.out.println("starting up ...");
+		logger.info("starting up ...");
 
 
 		// Configure the server.
@@ -60,8 +63,8 @@ public class SSSserver {
 		bootstrap.bind(new InetSocketAddress(8080));
 		
 		
-		System.out.println("Setting up dq2 environment ...");
-		System.out.println("connecting to ORACLE server ...");
+		logger.info("Setting up dq2 environment ...");
+		logger.info("connecting to ORACLE server ...");
 
 //		dbreader dbr = new dbreader(args[0], args[1], args[2], args[3], args[6]);
 //		dbr.connect();
