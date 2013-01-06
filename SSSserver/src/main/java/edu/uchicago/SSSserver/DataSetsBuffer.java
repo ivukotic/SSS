@@ -11,6 +11,17 @@ public class DataSetsBuffer {
 
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
 
+	private Dataset getDSfromName(String name) {
+		for (Dataset ds : dSets) {
+			if (ds.name.equalsIgnoreCase(name)) {
+				logger.info("DS: " + name + " FOUND in BUFFER.");
+				return ds;
+			}
+		}
+		logger.info("DS: " + name + "not in BUFFER.");
+		return null;
+	}
+
 	// returns size in bytes of the DS
 	public long getInputSize(String[] sDSs) {
 		long res = 0;
@@ -21,90 +32,91 @@ public class DataSetsBuffer {
 	}
 
 	private long getDSSize(String ds) {
-		long res = -1;
-		for (Dataset DS : dSets) {
-			if (DS.name.equalsIgnoreCase(ds)) {
-				logger.info("getDSSize DS: " + ds + " FOUND in the BUFFER");
-				res = DS.getSize();
-				if (res>0)
-					return res;
-			}
-		}
-
-		if (res == -1) {
+		
+		Dataset DS=getDSfromName(ds);
+		if (DS==null){
 			logger.info("DS not found in the buffer. Adding it.");
 			Dataset dSet = new Dataset(ds);
 			dSets.add(dSet);
 		}
-		
-		try {
-			logger.info("waiting 1 second.");
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		else{
+			long res = DS.getSize();
+			if (res > 0)
+				return res;
 		}
-		
+
 		return getDSSize(ds);
 	}
-	
 
 	public String getTreeDetails(String[] sDSs) {
-		
-		ArrayList<tree> summedTrees=new ArrayList<tree>();
-		boolean first=true;
+		int processedfiles = 0;
+		int totalfiles = 0;
+		ArrayList<tree> summedTrees = new ArrayList<tree>();
+		boolean first = true;
 		for (String DS : sDSs) {
-			ArrayList<tree> ts = getTrees(DS);
-			for (tree t: ts){
-				if (first) {
-					summedTrees.add(new tree(t.name,t.events,t.size));
-					first=false;
-					// need to copy branches too.
-				}else{
-					boolean found=false;
-					for (tree st: summedTrees){
-						if (st.name.equalsIgnoreCase(t.name) ){
-							st.events+=t.events;
-							st.size+=t.size;
-							// need to addup branches too.
-							found=true;
+			Dataset ds = getDSfromName(DS);
+			if (ds == null) {
+				logger.error("ds not found. should not happen.");
+				break;
+			}
+
+			ArrayList<tree> ts = getTrees(ds);
+			if (ts.size() == 0)
+				continue;
+
+			processedfiles += ds.processed;
+			totalfiles += ds.alRootFiles.size();
+			if (first) {
+				for (tree t : ts) {
+					tree crtree=new tree(t.name, t.events, t.size);
+					crtree.branches.addAll(t.branches);
+					summedTrees.add(crtree);
+				}
+				first = false;
+			} else {
+				for (tree t : ts) {
+					boolean found = false;
+					for (tree st : summedTrees) {
+						if (st.name.equalsIgnoreCase(t.name)) {
+							st.events += t.events;
+							st.size += t.size;
+							for (branch b:st.branches){
+								b.size+=t.getBranchSize(b.name);
+							}
+							found = true;
 							continue;
 						}
 					}
-					if (!found){
+					if (!found) {
 						logger.error("This file contains a tree not seen in the first file. Tree skipped.");
 					}
 				}
 			}
 		}
 
-		String res=summedTrees.size()+"\n";
-		for (tree st:summedTrees){
-			res+=st.name+":"+st.events+":"+st.size+":"+st.getNBranches()+"\n";
+		String res = summedTrees.size() + "\n";
+		for (tree st : summedTrees) {
+			res += st.name + ":" + st.events + ":" + st.size + ":" + st.getNBranches() + "\n";
+		}
+		res+=totalfiles+":"+processedfiles;
+		logger.info("total files: "+totalfiles+"\tprocessed files: "+processedfiles);
+		return res;
+	}
+
+	private ArrayList<tree> getTrees(Dataset ds) {
+		logger.info("getting tree info from DS: "+ds.name);
+		ArrayList<tree> res = ds.getTrees();
+		if (res.size() == 0) {
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			res = getTrees(ds);
+		}else{
+			logger.info("not yet ready. trying again.");
 		}
 		return res;
 	}
 
-	private ArrayList<tree> getTrees(String ds){
-
-		for (Dataset DS : dSets) {
-			if (DS.name.equalsIgnoreCase(ds)) {
-				logger.info("getTrees  DS: " + ds + " FOUND in the BUFFER.");
-
-				ArrayList<tree> res=DS.getTrees();
-				if (res.size()==0) {
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					res=getTrees(ds);
-				}
-				
-				return res;
-			}
-		}
-		logger.error("Should not happen: DS is not in buffer.");
-		return null;
-	}
-	
 }

@@ -17,7 +17,8 @@ public class RootFile {
 	private String gLFN;
 	private ArrayList<tree> trees;
 	boolean started;
-
+	boolean done;
+	
 	RootFile(String na, String gu, long si) {
 		name = na;
 		guid = gu;
@@ -25,12 +26,13 @@ public class RootFile {
 		logger.info("added file: " + toString());
 		trees = new ArrayList<tree>();
 		started = false;
+		done = false;
 	}
 
 	public ArrayList<tree> getTrees() {
-		if (trees.size() == 0 && !started) {
+		if (trees.size() == 0 && !started && !done) {
 			Inspector i = new Inspector();
-			started=true;
+			started = true;
 			i.start();
 		}
 		return trees;
@@ -56,12 +58,12 @@ public class RootFile {
 				line = input.readLine();
 				logger.debug(line);
 				if (line == null) {
-					logger.error("problem. nothing returned.");
+					logger.error("problem: should have returned number of trees in file. nothing returned.");
 				} else {
 					int nt = Integer.parseInt(line.trim());
 					for (int i = 0; i < nt; i++) {
 						line = input.readLine();
-						logger.debug(line);
+//						logger.debug(line);
 						String[] parts = line.split(":");
 						if (parts.length != 4) {
 							logger.error("problem in getting tree name, size, events");
@@ -72,13 +74,22 @@ public class RootFile {
 						Integer branches = Integer.parseInt(parts[3]);
 
 						tree toa = new tree(parts[0], events, size);
+
 						for (int j = 0; j < branches; j++) {
-							line = input.readLine().trim();
+							line = input.readLine();
 							if (line == null)
 								continue;
-							String[] br = line.split(":");
-							toa.addBranch(br[0], Long.parseLong(br[1]));
+							else
+								line = line.trim();
+							String[] br = line.split("\t");
+							if (br.length == 2) {
+								toa.addBranch(br[0], Long.parseLong(br[1]));
+							}
+							else {
+								logger.error("problematic line"+line);
+							}
 						}
+						logger.info(toa.toString());
 						trees.add(toa);
 					}
 				}
@@ -86,11 +97,13 @@ public class RootFile {
 			} catch (Exception e) {
 				logger.error("unrecognized exception: " + e.getMessage());
 			}
+			done=true;
+			
 		}
 
 	}
 
 	public String toString() {
-		return "ROOT file: " + name + "\tGUID: " + guid + "\t bytes: " + size;
+		return "ROOT file: " + name + "\t bytes: " + size;// + "\tGUID: " + guid;
 	}
 }

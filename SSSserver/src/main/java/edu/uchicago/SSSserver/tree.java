@@ -13,14 +13,14 @@ public class tree {
 	public long events;
 	public long size;
 	
-	private ArrayList<branch> branches = new ArrayList<branch>();
+	public ArrayList<branch> branches = new ArrayList<branch>();
 	
 	tree(){}
 	tree(String na, long ev, long si){
 		name=na;
 		events=ev;
 		size=si;
-		logger.info("created tree: "+toString());
+		logger.debug("created tree: "+toString());
 	}
 	
 	public void addBranch(String name, long size){
@@ -31,6 +31,22 @@ public class tree {
 		return branches.size();
 	}
 	
+	public ArrayList<branch> getBranches(){
+		return branches;
+	}
+	
+	public long getBranchSize(String brname){
+		for (branch b: branches){
+			if (b.name.equalsIgnoreCase(brname))
+				return b.size;
+		}
+		logger.warn("looking for unexisting branch");
+		return 0;
+	}
+	
+	public long getBranchSize(int brindex){
+		return branches.get(brindex).size;
+	}
 	
 	public String toString(){
 		return "tree:"+name+" entries:"+events+" size:"+size+" branches:"+branches.size();

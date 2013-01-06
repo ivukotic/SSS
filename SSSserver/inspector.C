@@ -43,7 +43,7 @@ public:
     void print(){
         cout<<name<<":"<<entries<<":"<<totSize<<":"<<branchSizes.size()<<endl;
         for(map<string,long>::iterator it = branchSizes.begin(); it != branchSizes.end(); it++){
-            cout<<it->first<<":"<<it->second<<endl;
+            cout<<it->first<<"\t"<<it->second<<endl;
         }
     }
 };

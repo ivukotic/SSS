@@ -17,8 +17,7 @@ public class Dataset {
 	public long events;
 	public ArrayList<RootFile> alRootFiles;
 	ArrayList<tree> trees;
-
-	public float processed;
+	public int processed;
 
 	Dataset(String na) {
 		name = na;
@@ -44,38 +43,56 @@ public class Dataset {
 	}
 
 	public ArrayList<tree> getTrees() {
-		if (processed < 1)
+		if (processed < alRootFiles.size())
 			updateTrees();
 		return trees;
 	}
 
 	public void updateTrees() {
 		processed = 0;
+		trees.clear();
 		boolean first = true;
 		for (RootFile rf : alRootFiles) {
 			ArrayList<tree> ts = rf.getTrees();
-			for (tree t : ts) {
-				if (first) {
-					trees.add(new tree(t.name, t.events, t.size));
-					first = false;
-					// need to copy branches too.
-				} else {
+
+			if (ts.size() == 0)
+				continue;
+			processed++;
+			// the first one having trees
+			if (first) {
+				for (tree t : ts) {
+					tree crtree=new tree(t.name, t.events, t.size);
+					crtree.branches.addAll(t.branches);
+					trees.add(crtree);
+				}
+				first = false;
+			} else {
+				for (tree t : ts) {
 					boolean found = false;
 					for (tree st : trees) {
 						if (st.name.equalsIgnoreCase(t.name)) {
 							st.events += t.events;
 							st.size += t.size;
-							// need to addup branches too.
+//							for (branch b:st.branches){
+//								b.size+=t.getBranchSize(b.name);
+//							}
+							if (st.getNBranches()!=t.getNBranches()) {
+								logger.error("these two trees don't have the same number of branches.");
+								continue;
+							}
+							for (int i=0;i<st.getNBranches();i++){
+								st.branches.get(i).size+=t.getBranchSize(i);
+							}
 							found = true;
-							continue;
+							break;
 						}
 					}
 					if (!found) {
-						logger.error("This file contains a tree not seen in the first file. Tree skipped.");
+						logger.error("This file contains a tree "+t.name+" not seen in the first file. Tree skipped.");
 					}
+
 				}
 			}
-
 		}
 	}
 
