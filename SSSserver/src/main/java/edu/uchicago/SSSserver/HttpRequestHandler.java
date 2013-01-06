@@ -5,8 +5,6 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
 import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Set;
@@ -29,8 +27,6 @@ import org.jboss.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.uchicago.SSSserver.Dataset.RootFile;
-
 public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 	private final Charset UTF8_CHARSET = Charset.forName("UTF-8");
@@ -41,126 +37,108 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	private StringBuilder buf = new StringBuilder();
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
 
-	public String runInspector(){
-		String res="";
-		for (Dataset ds: dSets){
-			try {
-				for (RootFile rf:ds.alRootFiles){
-					Runtime rt = Runtime.getRuntime();
-					String comm = "./inspector " + ds.gLFNpath+"/"+rf.name;
-					logger.info("executing >" + comm + "<");
-					Process pr = rt.exec(comm);
-					BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+	private DataSetsBuffer DSB;
 
-					String line = null;
-					while ((line = input.readLine()) != null) {
-						logger.debug(line);
-						res+=line+"\n";
-					}
-				}
-			} catch (Exception e) {
-				logger.error(e.toString());
-				e.printStackTrace();
-			}
-		}
-		return res;
+	HttpRequestHandler(DataSetsBuffer buf) {
+		DSB = buf;
 	}
-	
-	public void queryDQ2(String ds) {
-		try {
-			Dataset dSet = new Dataset(ds);
 
-			Runtime rt = Runtime.getRuntime();
-			String comm = "dq2-ls -f " + ds;
-			logger.info("executing >" + comm + "<");
-			Process pr = rt.exec(comm);
-
-			BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-
-			String line = null;
-			while ((line = input.readLine()) != null) {
-				if (line.indexOf(".root") > 0) {
-					logger.debug(line);
-					String[] r = line.split("\t");
-					if (r.length == 5)
-						dSet.addFile(r[1], r[2], Long.parseLong(r[4]));
-				}
-			}
-
-			int exitVal = pr.waitFor();
-			logger.info("Exited with code " + exitVal);
-			if (exitVal == 0)
-				dSets.add(dSet);
-
-			// get gLFN path 
-			comm = "dq2-list-files -p " + ds;
-			logger.info("executing >" + comm + "<");
-			Process pr1 = rt.exec(comm);
-			BufferedReader input1 = new BufferedReader(new InputStreamReader(pr1.getInputStream()));
-			line=null;
-			if ((line = input1.readLine()) != null){
-				logger.info(line);
-				line=line.substring(0,line.lastIndexOf("/"));
-				logger.info(line);
-			}
-			exitVal = pr1.waitFor();
-			logger.info("Exited with code " + exitVal);
-			
-			if (exitVal == 0)
-				dSet.setPath(line);
-
-		} catch (Exception e) {
-			logger.error(e.toString());
-			e.printStackTrace();
-		}
-		
-	}
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		logger.info("MessageReceived.");
 		dSets.clear();
-		
+
 		if (!readingChunks) {
 			HttpRequest request = this.request = (HttpRequest) e.getMessage();
 			SlicedChannelBuffer scb = (SlicedChannelBuffer) request.getContent();
-			logger.info("content: " + scb.toString(UTF8_CHARSET));
-			
-			Integer step=-1;
-			String ds = scb.toString(UTF8_CHARSET);
-			String[] pars = ds.split("&");
-			String sStep=pars[0];
-			String[] sSplit=sStep.split("=");
-			if (sSplit[0].equals("step")){
-				step=Integer.parseInt(sSplit[1]);
-			} else return;
-			logger.info("step: "+step.toString());
-			
-			String[] r = pars[1].split("=");
-			if (step==0 && r[0].equals("inds")) {
-				String[] dss = r[1].split(",");
-				for (String d : dss) {
-					queryDQ2(d);
-				}
+			logger.debug("content: " + scb.toString(UTF8_CHARSET));
+
+			String mes = scb.toString(UTF8_CHARSET);
+			String[] pars = mes.split("&");
+
+			for (String par : pars) {
+				logger.info(par);
 			}
+			logger.info("------------------------------------------------");
+
+			if (pars.length != 5) {
+				logger.error("Not enough parameters.");
+				return;
+			}
+
+			buf.setLength(0);
+
+			logger.info("datasets xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+			String[] sSplit = pars[0].split("=");
+
+			if (!sSplit[0].equals("inds"))
+				return;
+
+			logger.info("inds: " + sSplit[1]);
+			String[] dss = sSplit[1].split(",");
+
+			long totsize = DSB.getInputSize(dss);
+			buf.append("size:" + String.valueOf(totsize) + "\n");
+
+
+			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+			sSplit = pars[1].split("=");
+			if (!sSplit[0].equals("mainTree"))
+				return;
+
+			buf.append(DSB.getTreeDetails(dss));
+			
+			if (sSplit.length == 2){
+				logger.info("mainTree: " + sSplit[1]);
+				logger.info("mainTree selected.");
+			}
+
+			sSplit = pars[2].split("=");
+			if (!sSplit[0].equals("treesToCopy"))
+				return;
+
+			if (sSplit.length == 1) {
+				logger.info("No trees to copy selected.");
+			} else {
+				logger.info("treesToCopy: " + sSplit[1]);
+			}
+
+			logger.info("branches xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+			sSplit = pars[3].split("=");
+			if (!sSplit[0].equals("branchesToKeep"))
+				return;
+
+			if (sSplit.length == 1) {
+				logger.info("No branches to keep selected.");
+			} else {
+				logger.info("branches to keep: " + sSplit[1]);
+			}
+
+			
+			logger.info("cut code xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+			sSplit = pars[4].split("=");
+			if (!sSplit[0].equals("cutCode")) 
+				return;
+			
+			if (sSplit.length == 1) {
+				logger.info("No cut code.");
+			} else {
+				logger.info("cut code: " + sSplit[1]);
+			}
+
+			// ==================================================
 
 			if (is100ContinueExpected(request)) {
 				send100Continue(e);
 			}
 
-			long totsize=0;
-			for (Dataset das : dSets) {
-				totsize+=das.size;
-			}
-
-			buf.setLength(0);
-			buf.append("size:" + String.valueOf(totsize)+"\n");
-			buf.append(runInspector());
-			
 			if (request.isChunked()) {
 				readingChunks = true;
 			} else {
 				writeResponse(e);
+
+				logger.info("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			}
 		}
 	}
@@ -173,7 +151,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
 		logger.info("returns:\n" + buf.toString());
 		response.setContent(ChannelBuffers.copiedBuffer(buf, CharsetUtil.UTF_8));
-		
+
 		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
 
 		if (keepAlive) {
@@ -198,13 +176,13 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 		// Write the response.
 		ChannelFuture future = e.getChannel().write(response);
-		
+
 		// Close the non-keep-alive connection after the write operation is
 		// done.
 		if (!keepAlive) {
 			future.addListener(ChannelFutureListener.CLOSE);
 		}
-		
+
 	}
 
 	private void send100Continue(MessageEvent e) {
