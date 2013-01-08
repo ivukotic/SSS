@@ -98,8 +98,8 @@ public class DataSetsBuffer {
 		for (tree st : summedTrees) {
 			res += st.name + ":" + st.events + ":" + st.size + ":" + st.getNBranches() + "\n";
 		}
-		res+=totalfiles+":"+processedfiles;
-		logger.info("total files: "+totalfiles+"\tprocessed files: "+processedfiles);
+		res+=totalfiles+":"+processedfiles+"\n";
+		logger.info("total files: "+totalfiles+"\tprocessed files: "+processedfiles+"\n");
 		return res;
 	}
 

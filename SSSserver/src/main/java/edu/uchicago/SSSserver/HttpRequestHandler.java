@@ -91,7 +91,9 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			
 			if (sSplit.length == 2){
 				logger.info("mainTree: " + sSplit[1]);
-				logger.info("mainTree selected.");
+				buf.append(sSplit[1]+"\n");
+			}else{
+				buf.append("noTree\n");
 			}
 
 			sSplit = pars[2].split("=");
@@ -100,8 +102,10 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 			if (sSplit.length == 1) {
 				logger.info("No trees to copy selected.");
+				buf.append("NoTree\n"); 
 			} else {
 				logger.info("treesToCopy: " + sSplit[1]);
+				buf.append(sSplit[1]+"\n");
 			}
 
 			logger.info("branches xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
