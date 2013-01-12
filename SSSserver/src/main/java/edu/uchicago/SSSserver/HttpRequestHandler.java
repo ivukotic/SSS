@@ -40,6 +40,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	private DataSetsBuffer DSB;
 
 	HttpRequestHandler(DataSetsBuffer buf) {
+		logger.info("new HttpRequestHandler created...");
 		DSB = buf;
 	}
 
@@ -47,10 +48,17 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		logger.info("MessageReceived.");
+		
+		
 		dSets.clear();
 
 		if (!readingChunks) {
 			HttpRequest request = this.request = (HttpRequest) e.getMessage();
+			
+			if (is100ContinueExpected(request)) {
+				send100Continue(e);
+			}
+			
 			SlicedChannelBuffer scb = (SlicedChannelBuffer) request.getContent();
 			logger.debug("content: " + scb.toString(UTF8_CHARSET));
 
@@ -133,9 +141,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 			// ==================================================
 
-			if (is100ContinueExpected(request)) {
-				send100Continue(e);
-			}
+
 
 			if (request.isChunked()) {
 				readingChunks = true;
@@ -154,8 +160,8 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 		// Build the response object.
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
 		logger.info("returns:\n" + buf.toString());
+		
 		response.setContent(ChannelBuffers.copiedBuffer(buf, CharsetUtil.UTF_8));
-
 		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
 
 		if (keepAlive) {

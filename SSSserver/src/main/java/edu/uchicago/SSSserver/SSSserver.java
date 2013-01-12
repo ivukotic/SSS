@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,8 @@ public class SSSserver {
 
 	final static Logger logger = LoggerFactory.getLogger(SSSserver.class);
 
-	SSSserver() {
-	}
+//	SSSserver() {
+//	}
 
 //	public void send(String res) {
 //
@@ -52,9 +53,14 @@ public class SSSserver {
 	public static void main(String[] args) {
 		logger.info("starting up ...");
 
-
-		// Configure the server.
-		ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+		// this handles IO threads and their pools.
+		ChannelFactory factory=new NioServerSocketChannelFactory(
+				Executors.newCachedThreadPool(), 
+				Executors.newCachedThreadPool()
+				);
+		
+		// this helps setup server
+		ServerBootstrap bootstrap = new ServerBootstrap(factory);
 
 		// Set up the event pipeline factory.
 		bootstrap.setPipelineFactory(new HttpServerPipelineFactory());

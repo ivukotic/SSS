@@ -6,14 +6,25 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpServerPipelineFactory implements ChannelPipelineFactory {
-    public ChannelPipeline getPipeline() throws Exception {
+
+	final static Logger logger = LoggerFactory.getLogger(HttpServerPipelineFactory.class);
+
+    DataSetsBuffer DSB=new DataSetsBuffer();
+    
+	HttpServerPipelineFactory(){
+    	logger.info("new HttpServerPipelineFactory created!!!!");
+    }
+    
+	public ChannelPipeline getPipeline() throws Exception {
         // Create a default pipeline implementation.
         ChannelPipeline pipeline = pipeline();
-        
-        DataSetsBuffer DSB=new DataSetsBuffer();
-        
+
+    	logger.info("new ChannelPipeline created!!!!");
+    	
         pipeline.addLast("decoder", new HttpRequestDecoder());
         // Uncomment the following line if you don't want to handle HttpChunks.
         //pipeline.addLast("aggregator", new HttpChunkAggregator(1048576));

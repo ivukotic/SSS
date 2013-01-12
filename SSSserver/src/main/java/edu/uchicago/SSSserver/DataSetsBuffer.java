@@ -43,6 +43,13 @@ public class DataSetsBuffer {
 			long res = DS.getSize();
 			if (res > 0)
 				return res;
+			else
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 
 		return getDSSize(ds);
