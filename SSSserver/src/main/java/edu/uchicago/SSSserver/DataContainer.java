@@ -1,6 +1,10 @@
 package edu.uchicago.SSSserver;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 
 import org.slf4j.Logger;
@@ -155,5 +159,40 @@ public class DataContainer {
 		estEvents=inpEvents;
 		
 		return inpEvents + ":" + estEvents + ":" + estSize + ":" + estBranches;
+	}
+	
+	public void createCondorInputFiles(String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode){
+		SimpleDateFormat sDF = new SimpleDateFormat("SSS_ddMMyy-hhmmss.");
+		String fn = sDF.format(new Date());
+		
+//		njobs=0;
+		//decide how many files per job to submit.
+		
+		try { // input files  - this should be split into number of jobs.
+			FileWriter fstream = new FileWriter(fn + "inputFileList");
+			BufferedWriter out = new BufferedWriter(fstream);
+			for(Dataset ds:dSets){
+				ArrayList<RootFile> arf=ds.alRootFiles;
+				for (RootFile rf:arf)
+					out.write(rf.getFullgLFN());
+			}
+			out.close();
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		
+		try { // variables to keep
+			FileWriter fstream = new FileWriter(fn + "inputFileList");
+			BufferedWriter out = new BufferedWriter(fstream);
+			for(Dataset ds:dSets){
+				ArrayList<RootFile> arf=ds.alRootFiles;
+				for (RootFile rf:arf)
+					out.write(rf.getFullgLFN());
+			}
+			out.close();
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		
 	}
 }

@@ -1,0 +1,24 @@
+########################
+# Submit description file for SlimSkimService
+########################
+executable     = SSS.sh
+universe       = vanilla 
+input          = test.data                
+output         = test.out.$(Process)                
+error          = test.error             
+log            = test.log                                                    
+
+#######----------- Target cluster -----------######
+###### No target will run at first available  #####
+#---- Force UC3 seeder cluster
+#Requirements = ( regexp("^uc3.*", TARGET.Machine,"IM") == True )
+Requirements = (UidDomain == "osg-gk.mwt2.org") &&  ( regexp("^uc3.*", TARGET.Machine,"IM") == True )
+#---- Force seeder cluster OR MWT2
+#Requirements = UidDomain == "osg-gk.mwt2.org"
+#---- Force MWT2
+#Requirements = (UidDomain == "osg-gk.mwt2.org") && (regexp("^uct2.*",TARGET.Machine,"IM") == True)
+#---- Force ITS cluster
+#Requirements = (Machine == "appcloud01.uchicago.edu")
+#-------------------------------------------------#
+                                  
+Queue  10                

@@ -42,6 +42,9 @@ public class RootFile {
 		gLFN = glfn;
 	}
 
+	public String getFullgLFN(){
+		return gLFN+"/"+name;
+	}
 	private class Inspector extends Thread {
 
 		public void run() {
