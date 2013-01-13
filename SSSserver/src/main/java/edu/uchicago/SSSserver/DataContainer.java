@@ -6,13 +6,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DataContainer {
 
-	final Logger logger = LoggerFactory.getLogger(DataSetsBuffer.class);
+	final Logger logger = LoggerFactory.getLogger(DataContainer.class);
 
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
 
@@ -42,11 +43,22 @@ public class DataContainer {
 		}
 	}
 
-	public String getTreeDetails() {
+	private tree getTree(String name) {
+		for (tree t : summedTrees) {
+			if (t.getName().equals(name)) {
+				return t;
+			}
+		}
+		tree t=new tree();
+		summedTrees.add(t);
+		return t;
+	}
+
+	private void updateTrees() {
+
 		processedfiles = 0;
 		totalfiles = 0;
 		summedTrees.clear();
-		boolean first = true;
 
 		for (Dataset ds : dSets) {
 			ArrayList<tree> ts = getTrees(ds);
@@ -55,37 +67,21 @@ public class DataContainer {
 
 			processedfiles += ds.processed;
 			totalfiles += ds.alRootFiles.size();
-			if (first) {
-				for (tree t : ts) {
-					tree crtree = new tree(t.name, t.events, t.size);
-					crtree.branches.addAll(t.branches);
-					summedTrees.add(crtree);
-				}
-				first = false;
-			} else {
-				for (tree t : ts) {
-					boolean found = false;
-					for (tree st : summedTrees) {
-						if (st.name.equalsIgnoreCase(t.name)) {
-							st.events += t.events;
-							st.size += t.size;
-							for (branch b : st.branches) {
-								b.size += t.getBranchSize(b.name);
-							}
-							found = true;
-							continue;
-						}
-					}
-					if (!found) {
-						logger.error("This file contains a tree not seen in the first file. Tree skipped.");
-					}
-				}
+
+			for (tree t : ts) {
+				tree st=getTree(t.getName());
+				st.add(t);
 			}
+
 		}
+	}
+
+	public String getTreeDetails() {
+		updateTrees();
 
 		String res = summedTrees.size() + "\n";
 		for (tree st : summedTrees) {
-			res += st.name + ":" + st.events + ":" + st.size + ":" + st.getNBranches() + "\n";
+			res += st.getName() + ":" + st.getEvents() + ":" + st.getSize() + ":" + st.getNBranches() + "\n";
 		}
 		res += totalfiles + ":" + processedfiles + "\n";
 		logger.info("total files: " + totalfiles + "\tprocessed files: " + processedfiles + "\n");
@@ -102,25 +98,14 @@ public class DataContainer {
 				e.printStackTrace();
 			}
 			res = getTrees(ds);
-		} else {
-			logger.info("not yet ready. trying again.");
-		}
+		} 
 		return res;
-	}
-
-	private tree getTree(String name) {
-		for (tree st : summedTrees) {
-			if (st.name.equalsIgnoreCase(name)) {
-				return st;
-			}
-		}
-		return null;
 	}
 
 	public String getOutputEstimate(String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode) {
 		if (mainTree.equalsIgnoreCase("undefined") || branchesToKeep.size() == 0)
 			return "0:0:0:0";
-		logger.info("mainTree:" + mainTree);
+		logger.info("getting estimates. mainTree:" + mainTree);
 		for (String t : treesToCopy)
 			logger.info("tree to copy:" + t);
 
@@ -137,62 +122,61 @@ public class DataContainer {
 			logger.info("adding to the estimate a full size of treeToCopy: " + ttc);
 			tree t = getTree(ttc);
 			if (t != null)
-				estSize += t.size;
+				estSize += t.getSize();
 			else
 				logger.error("can't be that tree was not found");
 		}
 
 		tree t = getTree(mainTree);
-		inpEvents = t.events;
-		ArrayList<branch> brs = t.getBranches();
-		for (branch b : brs) {
+		inpEvents = t.getEvents();
+		for (Map.Entry<String, Long> b : t.getBranches().entrySet()) {
 			for (String inp : branchesToKeep) {
 				String matchString = inp.replace("*", "\\w+");
-				if (b.name.matches(matchString)) {
-					logger.debug("branch selected: " + b.name);
-					estSize += b.size;
+				if (b.getKey().matches(matchString)) {
+					logger.debug("branch selected: " + b.getKey() + "\tsize: " + b.getValue());
+					estSize += b.getValue();
 					estBranches++;
 				}
 			}
 		}
-		
-		estEvents=inpEvents;
-		
+
+		estEvents = inpEvents;
+
 		return inpEvents + ":" + estEvents + ":" + estSize + ":" + estBranches;
 	}
-	
-	public void createCondorInputFiles(String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode){
+
+	public void createCondorInputFiles(String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode) {
 		SimpleDateFormat sDF = new SimpleDateFormat("SSS_ddMMyy-hhmmss.");
 		String fn = sDF.format(new Date());
-		
-//		njobs=0;
-		//decide how many files per job to submit.
-		
-		try { // input files  - this should be split into number of jobs.
+
+		// njobs=0;
+		// decide how many files per job to submit.
+
+		try { // input files - this should be split into number of jobs.
 			FileWriter fstream = new FileWriter(fn + "inputFileList");
 			BufferedWriter out = new BufferedWriter(fstream);
-			for(Dataset ds:dSets){
-				ArrayList<RootFile> arf=ds.alRootFiles;
-				for (RootFile rf:arf)
+			for (Dataset ds : dSets) {
+				ArrayList<RootFile> arf = ds.alRootFiles;
+				for (RootFile rf : arf)
 					out.write(rf.getFullgLFN());
 			}
 			out.close();
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 		}
-		
+
 		try { // variables to keep
 			FileWriter fstream = new FileWriter(fn + "inputFileList");
 			BufferedWriter out = new BufferedWriter(fstream);
-			for(Dataset ds:dSets){
-				ArrayList<RootFile> arf=ds.alRootFiles;
-				for (RootFile rf:arf)
+			for (Dataset ds : dSets) {
+				ArrayList<RootFile> arf = ds.alRootFiles;
+				for (RootFile rf : arf)
 					out.write(rf.getFullgLFN());
 			}
 			out.close();
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 		}
-		
+
 	}
 }

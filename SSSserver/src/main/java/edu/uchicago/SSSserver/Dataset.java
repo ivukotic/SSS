@@ -16,13 +16,13 @@ public class Dataset {
 	private long size;
 	public long events;
 	public ArrayList<RootFile> alRootFiles;
-	ArrayList<tree> trees;
+	ArrayList<tree> summedTrees;
 	public int processed;
 
 	Dataset(String na) {
 		name = na;
 		alRootFiles = new ArrayList<RootFile>();
-		trees = new ArrayList<tree>();
+		summedTrees = new ArrayList<tree>();
 		processed = 0;
 		queryDQ2();
 	}
@@ -42,57 +42,39 @@ public class Dataset {
 		return size;
 	}
 
-	public ArrayList<tree> getTrees() {
-		if (processed < alRootFiles.size())
-			updateTrees();
-		return trees;
+	private tree getTree(String name) {
+		for (tree t : summedTrees) {
+			if (t.getName().equals(name)) {
+				return t;
+			}
+		}
+		tree t=new tree();
+		summedTrees.add(t);
+		return t;
 	}
 
-	public void updateTrees() {
+	public ArrayList<tree> getTrees() {
+//		if (processed == alRootFiles.size()) return summedTrees;
+		updateTrees();
+		return summedTrees;
+	}
+
+	private void updateTrees() {
 		processed = 0;
-		trees.clear();
-		boolean first = true;
+		summedTrees.clear();
 		for (RootFile rf : alRootFiles) {
+
 			ArrayList<tree> ts = rf.getTrees();
-
-			if (ts.size() == 0)
+			if (!rf.done || ts.size() == 0)
 				continue;
-			processed++;
-			// the first one having trees
-			if (first) {
-				for (tree t : ts) {
-					tree crtree=new tree(t.name, t.events, t.size);
-					crtree.branches.addAll(t.branches);
-					trees.add(crtree);
-				}
-				first = false;
-			} else {
-				for (tree t : ts) {
-					boolean found = false;
-					for (tree st : trees) {
-						if (st.name.equalsIgnoreCase(t.name)) {
-							st.events += t.events;
-							st.size += t.size;
-//							for (branch b:st.branches){
-//								b.size+=t.getBranchSize(b.name);
-//							}
-							if (st.getNBranches()!=t.getNBranches()) {
-								logger.error("these two trees don't have the same number of branches.");
-								continue;
-							}
-							for (int i=0;i<st.getNBranches();i++){
-								st.branches.get(i).size+=t.getBranchSize(i);
-							}
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						logger.error("This file contains a tree "+t.name+" not seen in the first file. Tree skipped.");
-					}
 
-				}
+			processed++;
+
+			for (tree t : ts) {
+				tree st = getTree(t.getName());
+				st.add(t);
 			}
+
 		}
 	}
 

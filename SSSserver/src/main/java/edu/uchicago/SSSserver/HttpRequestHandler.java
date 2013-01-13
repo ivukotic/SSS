@@ -5,11 +5,7 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
 import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -252,8 +248,8 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-		logger.error("eXcEpTiOn caught");
-		e.getCause().printStackTrace();
+		logger.debug("eXcEpTiOn caught. client broke connection.");
+//		e.getCause().printStackTrace();
 		e.getChannel().close();
 	}
 }

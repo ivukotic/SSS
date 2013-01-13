@@ -51,6 +51,7 @@ public class RootFile {
 			try {
 				if (gLFN.equalsIgnoreCase(""))
 					return;
+				trees.clear();
 				Runtime rt = Runtime.getRuntime();
 				String comm = "./inspector " + gLFN + "/" + name;
 				logger.info("executing >" + comm + "<");
@@ -62,6 +63,8 @@ public class RootFile {
 				logger.debug(line);
 				if (line == null) {
 					logger.error("problem: should have returned number of trees in file. nothing returned.");
+					started=false;
+					return;
 				} else {
 					int nt = Integer.parseInt(line.trim());
 					for (int i = 0; i < nt; i++) {
