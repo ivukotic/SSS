@@ -32,7 +32,7 @@ public:
             TBranch* branch = (TBranch*)t->GetListOfBranches()->UncheckedAt(i);
             branch->SetAddress(0);
             // cout <<i<<"\t"<<branch->GetName()<<"\t BS: "<< branch->GetBasketSize()<<"\t size: "<< branch->GetTotalSize()<< "\ttotbytes: "<<branch->GetTotBytes() << endl;
-            branchSizes.insert(std::pair<string,long>(branch->GetName(),branch->GetTotBytes())); 
+            branchSizes.insert(std::pair<string,long>(branch->GetName(),branch->GetZipBytes())); 
         }
     }
     string name;
