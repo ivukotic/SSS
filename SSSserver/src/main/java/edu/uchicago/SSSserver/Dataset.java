@@ -140,7 +140,7 @@ public class Dataset {
 			} else {
 				setPath(line);
 			}
-
+			logger.debug("dq2-list-files finished OK.");
 		} catch (Exception e) {
 			logger.error(e.toString());
 			e.printStackTrace();

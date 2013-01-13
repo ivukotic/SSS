@@ -5,12 +5,12 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
 import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.buffer.SlicedChannelBuffer;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
-	private final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 	final Logger logger = LoggerFactory.getLogger(HttpRequestHandler.class);
 	private HttpRequest request;
 	private boolean readingChunks;
@@ -44,25 +43,32 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 		DSB = buf;
 	}
 
-
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		logger.info("MessageReceived.");
-		
-		
+		logger.debug("Message: " + e.toString());
+
 		dSets.clear();
 
 		if (!readingChunks) {
 			HttpRequest request = this.request = (HttpRequest) e.getMessage();
-			
+
 			if (is100ContinueExpected(request)) {
+				logger.info("This was is100ContinueExpected message.");
 				send100Continue(e);
 			}
-			
-			SlicedChannelBuffer scb = (SlicedChannelBuffer) request.getContent();
-			logger.debug("content: " + scb.toString(UTF8_CHARSET));
 
-			String mes = scb.toString(UTF8_CHARSET);
+			logger.debug("Message headers: " + request.getHeaders().toString());
+
+			ChannelBuffer content = request.getContent();
+			if (content.readable()) {
+				logger.info("CONTENT: >" + content.toString(CharsetUtil.UTF_8) +"<");
+			}else{
+				logger.error("conten unreadable!!!");
+				return;
+			}
+
+			String mes = content.toString(CharsetUtil.UTF_8);
 			String[] pars = mes.split("&");
 
 			for (String par : pars) {
@@ -70,7 +76,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			}
 			logger.info("------------------------------------------------");
 
-			if (pars.length != 5) {
+			if (pars.length < 5) {
 				logger.error("Not enough parameters.");
 				return;
 			}
@@ -86,62 +92,96 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			logger.info("inds: " + sSplit[1]);
 			String[] dss = sSplit[1].split(",");
 
-			long totsize = DSB.getInputSize(dss);
-			buf.append("size:" + String.valueOf(totsize) + "\n");
+			DataContainer DC = DSB.getContainer(dss);
 
+			long totsize = DC.getInputSize();
+			buf.append("size:" + String.valueOf(totsize) + "\n");
+			buf.append(DC.getTreeDetails());
 
 			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+
 			sSplit = pars[1].split("=");
 			if (!sSplit[0].equals("mainTree"))
 				return;
-
-			buf.append(DSB.getTreeDetails(dss));
-			
-			if (sSplit.length == 2){
-				logger.info("mainTree: " + sSplit[1]);
-				buf.append(sSplit[1]+"\n");
-			}else{
+			String mainTree = null;
+			if (sSplit.length == 2) {
+				mainTree = sSplit[1];
+				logger.info("mainTree: " + mainTree);
+				buf.append(mainTree + "\n");
+			} else {
 				buf.append("noTree\n");
 			}
 
 			sSplit = pars[2].split("=");
 			if (!sSplit[0].equals("treesToCopy"))
 				return;
-
+			HashSet<String> treesToCopy = new HashSet<String>();
 			if (sSplit.length == 1) {
 				logger.info("No trees to copy selected.");
-				buf.append("NoTree\n"); 
+				buf.append("NoTree\n");
 			} else {
+				String[] ttC = sSplit[1].split(",");
+				for (String c : ttC)
+					treesToCopy.add(c);
 				logger.info("treesToCopy: " + sSplit[1]);
-				buf.append(sSplit[1]+"\n");
+				buf.append(sSplit[1] + "\n");
 			}
 
 			logger.info("branches xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			sSplit = pars[3].split("=");
 			if (!sSplit[0].equals("branchesToKeep"))
 				return;
-
+			HashSet<String> branchesToKeep = new HashSet<String>();
 			if (sSplit.length == 1) {
 				logger.info("No branches to keep selected.");
 			} else {
+				String[] byComma = sSplit[1].split(",");
+				for (String s : byComma) {
+					String[] byNewLine = s.split("\n");
+					for (String n : byNewLine)
+						branchesToKeep.add(n);
+				}
 				logger.info("branches to keep: " + sSplit[1]);
 			}
 
-			
 			logger.info("cut code xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			sSplit = pars[4].split("=");
-			if (!sSplit[0].equals("cutCode")) 
+			if (!sSplit[0].equals("cutCode"))
 				return;
-			
+			String cutCode = null;
 			if (sSplit.length == 1) {
 				logger.info("No cut code.");
 			} else {
-				logger.info("cut code: " + sSplit[1]);
+				cutCode = sSplit[1];
+				logger.info("cut code: " + cutCode);
 			}
-
+			buf.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
 			// ==================================================
+			if (pars.length == 7) {
+				logger.info("submit request xxxxxxxxxxxxxxxxxxxxxxxxxx");
+				sSplit = pars[5].split("=");
+				if (!sSplit[0].equals("outDS"))
+					return;
 
+				if (sSplit.length == 1) {
+					logger.error("No outDS !");
+				} else {
+					logger.info("outDS: " + sSplit[1]);
+				}
 
+				sSplit = pars[6].split("=");
+				if (!sSplit[0].equals("deliverTo"))
+					return;
+
+				if (sSplit.length == 1) {
+					logger.info("No delivery");
+				} else {
+					logger.info("deliverTo: " + sSplit[1]);
+				}
+
+				return;
+			}
+			// ==================================================
 
 			if (request.isChunked()) {
 				readingChunks = true;
@@ -160,7 +200,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 		// Build the response object.
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
 		logger.info("returns:\n" + buf.toString());
-		
+
 		response.setContent(ChannelBuffers.copiedBuffer(buf, CharsetUtil.UTF_8));
 		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
 

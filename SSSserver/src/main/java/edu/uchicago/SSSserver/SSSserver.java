@@ -65,6 +65,9 @@ public class SSSserver {
 		// Set up the event pipeline factory.
 		bootstrap.setPipelineFactory(new HttpServerPipelineFactory());
 
+		bootstrap.setOption("child.keepAlive", true);
+		bootstrap.setOption("child.tcpNoDelay", true);
+		
 		// Bind and start to accept incoming connections.
 		bootstrap.bind(new InetSocketAddress(8080));
 		
