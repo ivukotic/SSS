@@ -76,7 +76,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			}
 			logger.info("------------------------------------------------");
 
-			if (pars.length < 5) {
+			if (pars.length < 8) {
 				logger.error("Not enough parameters.");
 				return;
 			}
@@ -157,36 +157,44 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			}
 			buf.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
 			// ==================================================
-			if (pars.length == 7) {
+
+			sSplit = pars[5].split("=");
+			if (!sSplit[0].equals("sReq"))
+				return;
+			
+			if (sSplit[1].equals("1")) {
 				logger.info("submit request xxxxxxxxxxxxxxxxxxxxxxxxxx");
 
 				// create input files, submit script
 				DC.createCondorInputFiles(mainTree, treesToCopy, branchesToKeep, cutCode);
 
 				// execute condor_submit
-
-				sSplit = pars[5].split("=");
+				String outDS=null;
+				sSplit = pars[6].split("=");
 				if (!sSplit[0].equals("outDS"))
 					return;
 
 				if (sSplit.length == 1) {
 					logger.error("No outDS !");
 				} else {
-					logger.info("outDS: " + sSplit[1]);
+					outDS=sSplit[1];
+					logger.info("outDS: " + outDS);
 				}
 
-				sSplit = pars[6].split("=");
+				String deliverTo=null;
+				sSplit = pars[7].split("=");
 				if (!sSplit[0].equals("deliverTo"))
 					return;
 
 				if (sSplit.length == 1) {
 					logger.info("No delivery");
 				} else {
-					logger.info("deliverTo: " + sSplit[1]);
+					deliverTo=sSplit[1];
+					logger.info("deliverTo: " + deliverTo);
 				}
-
-				return;
+				buf.append("\nYour job has been submitted.");
 			}
+			else buf.append("\nOK");
 			// ==================================================
 
 			if (request.isChunked()) {

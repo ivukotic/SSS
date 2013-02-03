@@ -54,7 +54,7 @@ public class Dataset {
 	}
 
 	public ArrayList<tree> getTrees() {
-//		if (processed == alRootFiles.size()) return summedTrees;
+		if (processed == alRootFiles.size()) return summedTrees;
 		updateTrees();
 		return summedTrees;
 	}

@@ -36,7 +36,6 @@ public class DataContainer {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return getInputSize();
@@ -49,7 +48,7 @@ public class DataContainer {
 				return t;
 			}
 		}
-		tree t=new tree();
+		tree t = new tree();
 		summedTrees.add(t);
 		return t;
 	}
@@ -69,7 +68,7 @@ public class DataContainer {
 			totalfiles += ds.alRootFiles.size();
 
 			for (tree t : ts) {
-				tree st=getTree(t.getName());
+				tree st = getTree(t.getName());
 				st.add(t);
 			}
 
@@ -98,7 +97,7 @@ public class DataContainer {
 				e.printStackTrace();
 			}
 			res = getTrees(ds);
-		} 
+		}
 		return res;
 	}
 
@@ -146,8 +145,8 @@ public class DataContainer {
 	}
 
 	public void createCondorInputFiles(String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode) {
-		SimpleDateFormat sDF = new SimpleDateFormat("SSS_ddMMyy-hhmmss.");
-		String fn = sDF.format(new Date());
+		SimpleDateFormat sDF = new SimpleDateFormat("yy-MM-dd-hh:mm:ss.");
+		String fn = "SSS_" + sDF.format(new Date());
 
 		// njobs=0;
 		// decide how many files per job to submit.
@@ -158,7 +157,7 @@ public class DataContainer {
 			for (Dataset ds : dSets) {
 				ArrayList<RootFile> arf = ds.alRootFiles;
 				for (RootFile rf : arf)
-					out.write(rf.getFullgLFN());
+					out.write(rf.getFullgLFN() + "\n");
 			}
 			out.close();
 		} catch (Exception ex) {
@@ -166,14 +165,46 @@ public class DataContainer {
 		}
 
 		try { // variables to keep
-			FileWriter fstream = new FileWriter(fn + "inputFileList");
+			FileWriter fstream = new FileWriter(fn + "branchesList");
 			BufferedWriter out = new BufferedWriter(fstream);
-			for (Dataset ds : dSets) {
-				ArrayList<RootFile> arf = ds.alRootFiles;
-				for (RootFile rf : arf)
-					out.write(rf.getFullgLFN());
+			for (String btc : branchesToKeep) {
+				out.write(btc);
 			}
 			out.close();
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+
+		if (cutCode.length() > 0) {
+			try { // cutCode
+				FileWriter fstream = new FileWriter(fn + "cutCode");
+				BufferedWriter out = new BufferedWriter(fstream);
+				out.write(cutCode);
+				out.close();
+			} catch (Exception ex) {
+				logger.error(ex.getMessage());
+			}
+		}
+
+		try { // script to execute
+			FileWriter fstream = new FileWriter(fn + "sh");
+			BufferedWriter out = new BufferedWriter(fstream);
+			String res="#!/bin/zsh\n";
+			res+="source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
+			res+="source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
+			res+="\n";
+			res = "/home/ivukotic/SSS/SSSserver/filter-and-merge-d3pd.py ";
+			res += " --in=" + fn + "inputFileList";
+			res += " --out=" + "toBeDetermined";
+			res += " --tree=" + mainTree;
+			res += " --var=/home/ivukotic/SSS/SSSserver/" + fn + "branchesList";
+			if (cutCode.length() > 0)
+				res += " --selection=" + fn + "cutCode";
+			if (treesToCopy.size() > 0)
+				res += " --keep-all-trees";
+			out.write(res);
+			out.close();
+
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 		}
