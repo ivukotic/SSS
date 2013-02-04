@@ -166,8 +166,8 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 				logger.info("submit request xxxxxxxxxxxxxxxxxxxxxxxxxx");
 
 				// create input files, submit script
-				DC.createCondorInputFiles(mainTree, treesToCopy, branchesToKeep, cutCode);
-
+//				DC.createCondorInputFiles(mainTree, treesToCopy, branchesToKeep, cutCode);
+				
 				// execute condor_submit
 				String outDS=null;
 				sSplit = pars[6].split("=");
@@ -192,6 +192,10 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 					deliverTo=sSplit[1];
 					logger.info("deliverTo: " + deliverTo);
 				}
+
+				DC.insertJob(outDS, mainTree, treesToCopy, branchesToKeep, cutCode, deliverTo);
+				logger.debug("submitted");
+				
 				buf.append("\nYour job has been submitted.");
 			}
 			else buf.append("\nOK");

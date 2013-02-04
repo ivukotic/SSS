@@ -38,6 +38,13 @@ public class RootFile {
 		return trees;
 	}
 
+	public Long getEventsInTree(String treename){
+		for (tree t:trees){
+			if (t.getName().equals(treename)) return t.getEvents();
+		}
+		return 0L;
+	}
+	
 	public void setGLFN(String glfn) {
 		gLFN = glfn;
 	}

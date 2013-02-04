@@ -20,6 +20,9 @@ public class DataContainer {
 	ArrayList<tree> summedTrees = new ArrayList<tree>();
 	private int processedfiles;
 	private int totalfiles;
+	private long inpEvents;
+	private long estSize;
+	private long estEvents;
 
 	public void add(Dataset ds) {
 		dSets.add(ds);
@@ -108,9 +111,9 @@ public class DataContainer {
 		for (String t : treesToCopy)
 			logger.info("tree to copy:" + t);
 
-		long inpEvents = 0;
-		long estSize = 0;
-		long estEvents = 0;
+		inpEvents = 0;
+		estSize = 0;
+		estEvents = 0;
 		int estBranches = 0;
 
 		if (treesToCopy.contains(mainTree)) {
@@ -192,7 +195,7 @@ public class DataContainer {
 			String res="#!/bin/zsh\n";
 			res+="source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res+="source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
-			res+="\n";
+			res+="'need to deliver proxy with each job.\n";
 			res = "/home/ivukotic/SSS/SSSserver/filter-and-merge-d3pd.py ";
 			res += " --in=" + fn + "inputFileList";
 			res += " --out=" + "toBeDetermined";
@@ -208,6 +211,58 @@ public class DataContainer {
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 		}
+
+	}
+	
+	public void insertJob(String outdataset, String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode, String deliverTo) {
+
+		Submitter s=new Submitter();
+		s.connect();
+		String inputdatasets="";
+		for (Dataset ds : dSets) {
+			inputdatasets+=ds.name+"\n";
+		}
+		inputdatasets=inputdatasets.trim();
+		
+		String branches="";
+		for (String br:branchesToKeep){
+			branches+=br+"\n";
+		}
+		branches=branches.trim();
+		String tToCopy="";
+		for (String tr:treesToCopy){
+			tToCopy+=tr+"\n";
+		}
+		tToCopy=tToCopy.trim();
+		
+		Integer jobID=s.insertJob( inputdatasets,  outdataset, branches, cutCode, mainTree, tToCopy, deliverTo, inpEvents,getInputSize(),estSize,estEvents );
+		if (jobID>0){
+			for (Dataset ds : dSets) {
+				ArrayList<RootFile> arf = ds.alRootFiles;
+				for (RootFile rf : arf){
+					s.insertSubJob(jobID ,rf.getFullgLFN(), rf.size, rf.getEventsInTree(mainTree)  );
+				}
+			}
+		}
+		
+		s.disconnect();
+		
+//		 njobs=0;
+//		 decide how many files per job to submit.
+//		try { // input files - this should be split into number of jobs.
+//			FileWriter fstream = new FileWriter(fn + "inputFileList");
+//			BufferedWriter out = new BufferedWriter(fstream);
+//			for (Dataset ds : dSets) {
+//				ArrayList<RootFile> arf = ds.alRootFiles;
+//				for (RootFile rf : arf)
+//					out.write(rf.getFullgLFN() + "\n");
+//			}
+//			out.close();
+//		} catch (Exception ex) {
+//			logger.error(ex.getMessage());
+//		}
+
+
 
 	}
 }
