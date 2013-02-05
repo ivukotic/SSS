@@ -80,11 +80,11 @@ public class Task {
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
 			res += "'need to deliver proxy with each job.\n";
-			res = "/home/ivukotic/SSS/SSSserver/filter-and-merge-d3pd.py ";
+			res = System.getProperty("user.dir")+"/filter-and-merge-d3pd.py ";
 			res += " --in=" + fn + "inputFileList";
 			res += " --out=" + outFile;
 			res += " --tree=" + tree;
-			res += " --var=/home/ivukotic/SSS/SSSserver/" + fn + "branchesList";
+			res += " --var="+System.getProperty("user.dir")+"/" + fn + "branchesList";
 			if (cut != null)
 				res += " --selection=" + fn + "cutCode";
 			if (treesToCopy != null)
