@@ -1,5 +1,8 @@
 package edu.uchicago.SSSserver;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
@@ -53,6 +56,17 @@ public class SSSserver {
 	public static void main(String[] args) {
 		logger.info("starting up ...");
 
+		try { // write process number so shell can restart it if it crashes.
+			FileWriter fstream = new FileWriter("/tmp/.SSSserver.proc");
+			BufferedWriter out = new BufferedWriter(fstream);
+			String[] pr=ManagementFactory.getRuntimeMXBean().getName().split("@");
+			out.write(pr[0]+"\n");
+			out.close();
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		
+		
 		// this handles IO threads and their pools.
 		ChannelFactory factory=new NioServerSocketChannelFactory(
 				Executors.newCachedThreadPool(), 
