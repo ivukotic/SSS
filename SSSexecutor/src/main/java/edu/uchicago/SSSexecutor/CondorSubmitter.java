@@ -23,10 +23,10 @@ public class CondorSubmitter implements Submitter {
 			FileWriter fstream = new FileWriter(fn + "submit");
 			BufferedWriter out = new BufferedWriter(fstream);
 			String res = "getenv   = True\n";
-			res += "executable     = " + fn + ".sh\n";
-			res += "output         = " + fn + ".out\n";
-			res += "error          = " + fn + ".error\n";
-			res += "log            = " + fn + ".log\n";
+			res += "executable     = " + fn + "sh\n";
+			res += "output         = " + fn + "out\n";
+			res += "error          = " + fn + "error\n";
+			res += "log            = " + fn + "log\n";
 			res += "transfer_input_files = filter-and-merge-d3pd.py, /tmp/x509up_u20074\n";
 
 			String value = System.getenv("SSS_UNIVERSE");
