@@ -1,10 +1,6 @@
 package edu.uchicago.SSSserver;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -147,72 +143,6 @@ public class DataContainer {
 		return inpEvents + ":" + estEvents + ":" + estSize + ":" + estBranches;
 	}
 
-	public void createCondorInputFiles(String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode) {
-		SimpleDateFormat sDF = new SimpleDateFormat("yy-MM-dd-hh:mm:ss.");
-		String fn = "SSS_" + sDF.format(new Date());
-
-		// njobs=0;
-		// decide how many files per job to submit.
-
-		try { // input files - this should be split into number of jobs.
-			FileWriter fstream = new FileWriter(fn + "inputFileList");
-			BufferedWriter out = new BufferedWriter(fstream);
-			for (Dataset ds : dSets) {
-				ArrayList<RootFile> arf = ds.alRootFiles;
-				for (RootFile rf : arf)
-					out.write(rf.getFullgLFN() + "\n");
-			}
-			out.close();
-		} catch (Exception ex) {
-			logger.error(ex.getMessage());
-		}
-
-		try { // variables to keep
-			FileWriter fstream = new FileWriter(fn + "branchesList");
-			BufferedWriter out = new BufferedWriter(fstream);
-			for (String btc : branchesToKeep) {
-				out.write(btc);
-			}
-			out.close();
-		} catch (Exception ex) {
-			logger.error(ex.getMessage());
-		}
-
-		if (cutCode.length() > 0) {
-			try { // cutCode
-				FileWriter fstream = new FileWriter(fn + "cutCode");
-				BufferedWriter out = new BufferedWriter(fstream);
-				out.write(cutCode);
-				out.close();
-			} catch (Exception ex) {
-				logger.error(ex.getMessage());
-			}
-		}
-
-		try { // script to execute
-			FileWriter fstream = new FileWriter(fn + "sh");
-			BufferedWriter out = new BufferedWriter(fstream);
-			String res="#!/bin/zsh\n";
-			res+="source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
-			res+="source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
-			res+="'need to deliver proxy with each job.\n";
-			res = "/home/ivukotic/SSS/SSSserver/filter-and-merge-d3pd.py ";
-			res += " --in=" + fn + "inputFileList";
-			res += " --out=" + "toBeDetermined";
-			res += " --tree=" + mainTree;
-			res += " --var=/home/ivukotic/SSS/SSSserver/" + fn + "branchesList";
-			if (cutCode.length() > 0)
-				res += " --selection=" + fn + "cutCode";
-			if (treesToCopy.size() > 0)
-				res += " --keep-all-trees";
-			out.write(res);
-			out.close();
-
-		} catch (Exception ex) {
-			logger.error(ex.getMessage());
-		}
-
-	}
 	
 	public void insertJob(String outdataset, String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode, String deliverTo) {
 
@@ -247,21 +177,6 @@ public class DataContainer {
 		
 		s.disconnect();
 		
-//		 njobs=0;
-//		 decide how many files per job to submit.
-//		try { // input files - this should be split into number of jobs.
-//			FileWriter fstream = new FileWriter(fn + "inputFileList");
-//			BufferedWriter out = new BufferedWriter(fstream);
-//			for (Dataset ds : dSets) {
-//				ArrayList<RootFile> arf = ds.alRootFiles;
-//				for (RootFile rf : arf)
-//					out.write(rf.getFullgLFN() + "\n");
-//			}
-//			out.close();
-//		} catch (Exception ex) {
-//			logger.error(ex.getMessage());
-//		}
-
 
 
 	}
