@@ -80,7 +80,7 @@ public class Task {
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
 			res += "'need to deliver proxy with each job.\n";
-			res = System.getProperty("user.dir")+"/filter-and-merge-d3pd.py ";
+			res += "python filter-and-merge-d3pd.py ";
 			res += " --in=" + fn + "inputFileList";
 			res += " --out=" + outFile;
 			res += " --tree=" + tree;
