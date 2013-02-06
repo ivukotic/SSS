@@ -32,7 +32,7 @@ public class CondorSubmitter implements Submitter {
 			filesToTransfer += fn+"inputFileList,";
 			filesToTransfer += fn+"branchesList";
 			if (task.cut != null)  filesToTransfer += ","+fn+"cutCode";
-			res += "transfer_input_files = "+filesToTransfer;
+			res += "transfer_input_files = "+filesToTransfer+"\n";
 
 			String value = System.getenv("SSS_UNIVERSE");
 			if (value == null) {
