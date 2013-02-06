@@ -77,14 +77,14 @@ public class Task {
 			FileWriter fstream = new FileWriter(fn + "sh");
 			BufferedWriter out = new BufferedWriter(fstream);
 			String res = "#!/bin/zsh\n";
+			res += "export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
-			res += "'need to deliver proxy with each job.\n";
 			res += "python filter-and-merge-d3pd.py ";
 			res += " --in=" + fn + "inputFileList";
 			res += " --out=" + outFile;
 			res += " --tree=" + tree;
-			res += " --var="+System.getProperty("user.dir")+"/" + fn + "branchesList";
+			res += " --var=" + fn + "branchesList";
 			if (cut != null)
 				res += " --selection=" + fn + "cutCode";
 			if (treesToCopy != null)

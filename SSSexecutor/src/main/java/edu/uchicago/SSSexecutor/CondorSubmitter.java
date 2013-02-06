@@ -22,7 +22,7 @@ public class CondorSubmitter implements Submitter {
 		try { // script to execute
 			FileWriter fstream = new FileWriter(fn + "submit");
 			BufferedWriter out = new BufferedWriter(fstream);
-			String res = "getenv   = True\n";
+			String res = "getenv   = False\n";
 			res += "executable     = " + fn + "sh\n";
 			res += "output         = " + fn + "out\n";
 			res += "error          = " + fn + "error\n";
