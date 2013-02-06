@@ -89,6 +89,7 @@ public class Task {
 			res += "export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
+			res += "export X509_USER_PROXY=x509up_u20074\n";
 			res += "python filter-and-merge-d3pd.py ";
 			res += " --in=" + fn + "inputFileList";
 			res += " --out=" + outFile;
