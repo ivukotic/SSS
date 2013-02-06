@@ -38,11 +38,22 @@ public class Task {
 	public void createFiles() {
 		String fn = "SSS_" + id + ".";
 
+		
+		
+		String redi = System.getenv("STORAGEPREFIX");
+		if (redi == null) {
+			logger.info("no STORAGEPREFIX defined. Using global redirector: root://glrd.usatlas.org/ .");
+		} else {
+			logger.info("using redirector: "+redi);
+		}
+		
+		
 		logger.info("Creating inputFiles file.");
 		try { // input files
 			FileWriter fstream = new FileWriter(fn + "inputFileList");
 			BufferedWriter out = new BufferedWriter(fstream);
 			for (String s : inputFiles) {
+				if (redi!=null) s.replaceFirst("root://glrd.usatlas.org/", redi);
 				out.write(s + "\n");
 			}
 			out.close();
