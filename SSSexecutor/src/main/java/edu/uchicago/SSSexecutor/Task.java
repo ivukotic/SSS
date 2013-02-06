@@ -90,7 +90,7 @@ public class Task {
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
 			res += "python filter-and-merge-d3pd.py ";
-			res += " --in=" + System.getProperty("user.dir") + "/" + fn + "inputFileList";
+			res += " --in=" + fn + "inputFileList";
 			res += " --out=" + outFile;
 			res += " --tree=" + tree;
 			res += " --var=" + fn + "branchesList";

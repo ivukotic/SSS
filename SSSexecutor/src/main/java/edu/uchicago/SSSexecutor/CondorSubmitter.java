@@ -27,7 +27,7 @@ public class CondorSubmitter implements Submitter {
 			res += "output         = " + fn + "out\n";
 			res += "error          = " + fn + "error\n";
 			res += "log            = " + fn + "log\n";
-			res += "transfer_input_files = filter-and-merge-d3pd.py, /tmp/x509up_u20074\n";
+			res += "transfer_input_files = filter-and-merge-d3pd.py, /tmp/x509up_u20074, "+ fn +"inputFileList, "+fn+"branchesList, "+fn+"cutCode\n";
 
 			String value = System.getenv("SSS_UNIVERSE");
 			if (value == null) {
