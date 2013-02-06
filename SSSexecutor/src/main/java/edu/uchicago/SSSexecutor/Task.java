@@ -38,22 +38,20 @@ public class Task {
 	public void createFiles() {
 		String fn = "SSS_" + id + ".";
 
-		
-		
 		String redi = System.getenv("STORAGEPREFIX");
 		if (redi == null) {
 			logger.info("no STORAGEPREFIX defined. Using global redirector: root://glrd.usatlas.org/ .");
 		} else {
-			logger.info("using redirector: "+redi);
+			logger.info("using redirector: " + redi);
 		}
-		
-		
+
 		logger.info("Creating inputFiles file.");
 		try { // input files
 			FileWriter fstream = new FileWriter(fn + "inputFileList");
 			BufferedWriter out = new BufferedWriter(fstream);
 			for (String s : inputFiles) {
-				if (redi!=null) s.replaceFirst("root://glrd.usatlas.org/", redi);
+				if (redi != null)
+					s.replaceFirst("root://glrd.usatlas.org/", redi);
 				out.write(s + "\n");
 			}
 			out.close();
@@ -92,7 +90,7 @@ public class Task {
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
 			res += "python filter-and-merge-d3pd.py ";
-			res += " --in=" + fn + "inputFileList";
+			res += " --in=" + System.getProperty("user.dir") + "/" + fn + "inputFileList";
 			res += " --out=" + outFile;
 			res += " --tree=" + tree;
 			res += " --var=" + fn + "branchesList";
@@ -105,7 +103,7 @@ public class Task {
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
 		}
-		
+
 		logger.info("All files created");
 	}
 
