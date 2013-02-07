@@ -7,7 +7,7 @@ export STORAGEPREFIX=root://fax.mwt2.org/
 
 cd ~/SSS/SSSexecutor
 
-if [ -f = "/tmp/.SSSexecutor.proc" ]
+if [ -f "/tmp/.SSSexecutor.proc" ]
 then
 	echo "found /tmp/.SSSexecutor.proc. reading proc number"
 	proc=$(head -1 /tmp/.SSSexecutor.proc)

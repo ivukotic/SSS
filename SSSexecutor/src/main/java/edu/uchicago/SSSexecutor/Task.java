@@ -51,7 +51,7 @@ public class Task {
 			BufferedWriter out = new BufferedWriter(fstream);
 			for (String s : inputFiles) {
 				if (redi != null)
-					s.replaceFirst("root://glrd.usatlas.org/", redi);
+					s=s.replaceFirst("root://glrd.usatlas.org/", redi);
 				out.write(s + "\n");
 			}
 			out.close();

@@ -6,7 +6,7 @@ source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --skip
 
 voms-proxy-init -cert $HOME/.globus/usercert.pem -key $HOME/.globus/userkey.pem -voms atlas -pwstdin < $HOME/gridlozinka.txt
 
-if [ -f = "/tmp/.SSSserver.proc" ] 
+if [ -f "/tmp/.SSSserver.proc" ] 
 then
 	echo "found /tmp/.SSSserver.proc. reading proc number"
 	proc=$(head -1 /tmp/.SSSserver.proc)
