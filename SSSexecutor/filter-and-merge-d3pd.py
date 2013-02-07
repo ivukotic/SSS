@@ -651,7 +651,7 @@ Accepted command line options:
         jobid=getjt[0]
         taskid=getjt[1]
         machine=socket.gethostname()
-        callproc("SSS_STARTTASK", [taskid, machine])
+        cursor.callproc("SSS_STARTTASK", [taskid, machine])
         cursor.close()
         
     except cx_Oracle.DatabaseError, exc:

@@ -88,7 +88,7 @@ public class Submitter {
 	public void insertSubJob(Integer jobID, String fname, Long size, Long events){
 		PreparedStatement statement = null;
 		try {
-			String SQL_INSERT = "INSERT INTO SSS_SUBJOBS (JOBID, INPUTFILES, INPUTSIZE, INPUTEVENTS) values (?,?,?,?)";
+			String SQL_INSERT = "INSERT INTO SSS_FILES (JOBID, NAME, FILESIZE, EVENTS) values (?,?,?,?)";
 			statement = conn.prepareStatement(SQL_INSERT);
 			statement.setInt(1, jobID);
 			statement.setString(2, fname);
