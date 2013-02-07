@@ -27,7 +27,7 @@ public class CondorSubmitter implements Submitter {
 			res += "output         = " + fn + "out\n";
 			res += "error          = " + fn + "error\n";
 			res += "log            = " + fn + "log\n";
-			String filesToTransfer = "filter-and-merge-d3pd.py,";
+			String filesToTransfer = "filter-and-merge-d3pd.py,.OracleAccess.txt,";
 			filesToTransfer += "/tmp/x509up_u20074,";
 			filesToTransfer += fn+"inputFileList,";
 			filesToTransfer += fn+"branchesList";
