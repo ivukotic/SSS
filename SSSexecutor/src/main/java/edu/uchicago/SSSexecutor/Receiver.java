@@ -75,7 +75,7 @@ public class Receiver {
 			task.deliverTo = cs1.getString(7);
 
 			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT filename from SSS_FILES where taskid=" + task.id.toString());
+			ResultSet rs = stmt.executeQuery("SELECT name from SSS_FILES where taskid=" + task.id.toString());
 			while (rs.next()) {
 				task.inputFiles.add(rs.getString(1));
 			}
