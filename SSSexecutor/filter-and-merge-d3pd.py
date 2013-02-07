@@ -13,6 +13,9 @@ import atexit
 import ROOT
 import PyCintex; PyCintex.Cintex.Enable()
 
+import cx_Oracle
+import socket
+
 # root globals to prevent ROOT garbage collector to sweep the rug....
 _root_files = []
 _root_trees = []
@@ -631,6 +634,35 @@ Accepted command line options:
     print "::: user filter:   ",opts.selection
     print "::: keep all trees:", opts.keep_all_trees
 
+    #********************************************************* ILIJA instrumentation
+    with open('.OracleAccess.txt', 'r') as f: 
+        lines=f.readlines()
+        for line in lines:
+            if 'ATLAS_WANHCTEST' in line:
+                break
+        f.close()
+
+    try:
+        connection = cx_Oracle.Connection(line)
+        cursor = cx_Oracle.Cursor(connection)
+        print 'Connection established.'
+        getjt=opts.output_file.replace('SSS_NTUP_','').replace('.root','')
+        getjt=getjt.split('_')
+        jobid=getjt[0]
+        taskid=getjt[1]
+        machine=socket.gethostname()
+        callproc("SSS_STARTTASK", [taskid, machine])
+        cursor.close()
+        
+    except cx_Oracle.DatabaseError, exc:
+        error, = exc.args
+        print "filter-and-merge.py - problem in establishing connection to db"
+        print "filter-and-merge.py Oracle-Error-Code:", error.code
+        print "filter-and-merge.py Oracle-Error-Message:", error.message
+
+    # ***************************************************************************************
+    
+    
     # slightly increase the max size (so that the manual ChangeFile at 0.9 of
     # the current MaxTreeSize will fall within the user-provided one...)
     ROOT.TTree.SetMaxTreeSize(long(opts.maxsize * 1024 * 1024 / 0.9))
