@@ -385,7 +385,25 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
         del tree
         f.Close()
         del f
+        
+        
+        try:
+            connection = cx_Oracle.Connection(line)
+            cursor = cx_Oracle.Cursor(connection)
+            print 'Connection established.'
+            machine=socket.gethostname()
+            cursor.callproc("SSS_FINISH_FILE", [taskid, nentries, n_pass])
+            cursor.close()
+        
+        except cx_Oracle.DatabaseError, exc:
+            error, = exc.args
+            print "filter-and-merge.py - problem in establishing connection to db"
+            print "filter-and-merge.py Oracle-Error-Code:", error.code
+            print "filter-and-merge.py Oracle-Error-Message:", error.message
+        
         pass # loop over input trees
+        
+        
     print "::: processing [%i] trees... [done]" % (len(fnames,))
 
     eff = 0.
@@ -745,6 +763,26 @@ Accepted command line options:
     print "::: merging done in:"
     print ":::   wallclock:",timer.RealTime()
     print ":::   CPU time: ",timer.CpuTime()
+
+
+
+    try:
+        connection = cx_Oracle.Connection(line)
+        cursor = cx_Oracle.Cursor(connection)
+        print 'Connection established.'
+        machine=socket.gethostname()
+        cursor.callproc("SSS_FINISH_TASK", [taskid, 4, timer.CpuTime()/timer.RealTime()])
+        cursor.close()
+        
+    except cx_Oracle.DatabaseError, exc:
+        error, = exc.args
+        print "filter-and-merge.py - problem in establishing connection to db"
+        print "filter-and-merge.py Oracle-Error-Code:", error.code
+        print "filter-and-merge.py Oracle-Error-Message:", error.message
+
+
+
+
 
     # del _root_chains[:]
     
