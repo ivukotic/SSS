@@ -20,7 +20,8 @@ import socket
 _root_files = []
 _root_trees = []
 
-
+taskid=0
+jobid=0
 connline=''
 with open('.OracleAccess.txt', 'r') as f: 
     lines=f.readlines()
