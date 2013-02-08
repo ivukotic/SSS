@@ -1,0 +1,65 @@
+package edu.uchicago.SSSexecutor;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class Dq2Puter {
+
+	final Logger logger = LoggerFactory.getLogger(Dq2Puter.class);
+
+	void put(Task task) {
+		logger.info("Creating dq2-put script to execute.");
+		String fn = "SSS_uploader_" + task.id + ".sh";
+		try { // script to execute
+			FileWriter fstream = new FileWriter(fn);
+			BufferedWriter out = new BufferedWriter(fstream);
+			String res = "#!/bin/zsh\n";
+			res += "export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase\n";
+			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
+			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --dq2ClientVersion current --skipConfirm\n";
+			res += "export X509_USER_PROXY=x509up_u20074\n";
+			res += "dq2-put -C -a -f "+task.outFile;
+			if ( task.deliverTo != null)
+				res += " -L" + fn + task.deliverTo;
+			res += " "+task.dataset+"\n";
+			out.write(res);
+			out.close();
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		
+		
+		// start it
+		Runtime rt = Runtime.getRuntime();
+		String[] comm = { fn };
+		try {
+			Process proc = rt.exec(comm);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+
+			// read the output from the submit command
+			logger.info("start output:\n");
+			String s;
+			while ((s = stdInput.readLine()) != null) {
+				logger.info(s);
+			}
+
+			// read any errors from the submit command
+			while ((s = stdError.readLine()) != null) {
+				logger.error("there is an error from start command...");
+				logger.error(s);
+			}
+			
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		
+		
+	}
+}

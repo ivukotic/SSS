@@ -87,5 +87,30 @@ public class Receiver {
 		logger.info("getJob done");
 		return task;
 	}
+	
+	public Task getTaskToUpload() {
+		logger.info("getTaskToUpload started");
+		Task task = new Task();
+		try {
+
+			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK_TO_UPLOAD(?,?,?,?)}");
+			cs1.registerOutParameter(1, Types.INTEGER);
+			cs1.registerOutParameter(2, Types.VARCHAR);
+			cs1.registerOutParameter(3, Types.VARCHAR);
+			cs1.registerOutParameter(4, Types.VARCHAR);
+			cs1.executeQuery();
+			task.id = cs1.getInt(1);
+			task.outFile = cs1.getString(2);
+			task.dataset = cs1.getString(3);
+			task.deliverTo = cs1.getString(4);
+			cs1.close();
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
+		logger.info("getTaskToUpload done");
+		return task;
+	}
 
 }

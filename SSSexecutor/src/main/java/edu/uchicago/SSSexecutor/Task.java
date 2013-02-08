@@ -14,6 +14,7 @@ public class Task {
 
 	public Integer id = 0;
 	public String outFile;
+	public String dataset;
 	public String cut;
 	public String branches;
 	public String tree;
@@ -24,6 +25,7 @@ public class Task {
 	public void print() {
 		logger.info("taskID:       " + id.toString());
 		logger.info("outFile:      " + outFile);
+		logger.info("dataset:      " + dataset);
 		logger.info("cut:          " + cut);
 		logger.info("tree:         " + tree);
 		logger.info("treesToCopy:  " + treesToCopy);

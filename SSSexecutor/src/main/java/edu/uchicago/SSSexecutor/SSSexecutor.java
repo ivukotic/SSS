@@ -33,12 +33,18 @@ public class SSSexecutor {
 			Receiver r = new Receiver();
 			r.connect();
 			Task task = r.getJob();
+			Task taskToUpload=r.getTaskToUpload();
 			r.disconnect();
 			if (task.id > 0 ) {
 				task.print();
 				CondorSubmitter s = new CondorSubmitter();
 				s.submit(task);
-			} else {
+			} else if(taskToUpload.id >0){
+				taskToUpload.print();
+				Dq2Puter dq2=new Dq2Puter();
+				dq2.put(taskToUpload);
+			}
+			else {
 				try {
 					Thread.currentThread().sleep(60000);
 				} catch (Exception e) {
