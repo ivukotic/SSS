@@ -748,17 +748,17 @@ Accepted command line options:
 
     # del _root_chains[:]
     
-    print "::: performing re-ordering..."
-    import glob
-    import os.path as osp
-    fname_pattern = osp.splitext(opts.output_file)[0]
-    # re-order all output files (in case they were split off)
-    fnames= sorted(glob.glob(fname_pattern + "*.root"))
-    order(m=2,
-          chain_name=opts.tree_name,
-          fnames=fnames,
-          workdir=workdir)
-    print "::: performing re-ordering... [done]"
+    print "::: NOT performing re-ordering !"
+    # import glob
+    # import os.path as osp
+    # fname_pattern = osp.splitext(opts.output_file)[0]
+    # # re-order all output files (in case they were split off)
+    # fnames= sorted(glob.glob(fname_pattern + "*.root"))
+    # order(m=2,
+    #       chain_name=opts.tree_name,
+    #       fnames=fnames,
+    #       workdir=workdir)
+    # print "::: performing re-ordering... [done]"
 
     print "::: bye."
     print ":"*80
