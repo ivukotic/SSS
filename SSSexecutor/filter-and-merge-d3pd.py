@@ -20,6 +20,15 @@ import socket
 _root_files = []
 _root_trees = []
 
+
+connline=''
+with open('.OracleAccess.txt', 'r') as f: 
+    lines=f.readlines()
+    for connline in lines:
+        if 'ATLAS_WANHCTEST' in connline:
+            break
+    f.close()
+    
 # Root has a global dtor ordering problem: the cintex trampolines
 # may be deleted before open files are closed.  Workaround is to explicitly
 # close open files before terminating.
@@ -388,7 +397,7 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
         
         
         try:
-            connection = cx_Oracle.Connection(line)
+            connection = cx_Oracle.Connection(connline)
             cursor = cx_Oracle.Cursor(connection)
             print 'Connection established.'
             machine=socket.gethostname()
@@ -653,15 +662,10 @@ Accepted command line options:
     print "::: keep all trees:", opts.keep_all_trees
 
     #********************************************************* ILIJA instrumentation
-    with open('.OracleAccess.txt', 'r') as f: 
-        lines=f.readlines()
-        for line in lines:
-            if 'ATLAS_WANHCTEST' in line:
-                break
-        f.close()
+
 
     try:
-        connection = cx_Oracle.Connection(line)
+        connection = cx_Oracle.Connection(connline)
         cursor = cx_Oracle.Cursor(connection)
         print 'Connection established.'
         getjt=opts.output_file.replace('SSS_NTUP_','').replace('.root','')
@@ -767,7 +771,7 @@ Accepted command line options:
 
 
     try:
-        connection = cx_Oracle.Connection(line)
+        connection = cx_Oracle.Connection(connline)
         cursor = cx_Oracle.Cursor(connection)
         print 'Connection established.'
         machine=socket.gethostname()
