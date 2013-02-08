@@ -671,8 +671,8 @@ Accepted command line options:
         print 'Connection established.'
         getjt=opts.output_file.replace('SSS_NTUP_','').replace('.root','')
         getjt=getjt.split('_')
-        jobid=getjt[0]
-        taskid=getjt[1]
+        jobid=int(getjt[0])
+        taskid=int(getjt[1])
         machine=socket.gethostname()
         cursor.callproc("SSS_START_TASK", [taskid, machine])
         cursor.close()
