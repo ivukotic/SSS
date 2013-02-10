@@ -24,6 +24,7 @@ public class DataContainer {
 		dSets.add(ds);
 	}
 
+	
 	public long getInputSize() {
 		long res = 0;
 		for (Dataset ds : dSets) {
@@ -59,22 +60,21 @@ public class DataContainer {
 		summedTrees.clear();
 
 		for (Dataset ds : dSets) {
-			ArrayList<tree> treesInDS = getTrees(ds);
-			if (treesInDS.size() == 0)
+			ArrayList<tree> ts = getTrees(ds);
+			if (ts.size() == 0)
 				continue;
 
 			processedfiles += ds.processed;
 			totalfiles += ds.alRootFiles.size();
 
-			for (tree t : treesInDS) {
-//				tree st = 
-				getTree(t.getName());
-//				summedTrees.add(t);
+			for (tree t : ts) {
+				getTree(t.getName()).add(t);
 			}
 
 		}
 	}
 
+	// this one starts chain reaction of inspect-ing root files
 	public String getTreeDetails() {
 		updateTrees();
 

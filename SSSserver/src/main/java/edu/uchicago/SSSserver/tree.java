@@ -69,7 +69,7 @@ public class tree {
 		for (Map.Entry<String,Long> br:m_branches.entrySet()){
 			Long ntbs=treeToAdd.getBranchSize(br.getKey());
 			if (ntbs==null) {
-				logger.error("branch: "+br.getKey()+" does is missing from one of the files.");
+				logger.error("branch: "+br.getKey()+" is missing from one of the files.");
 			}else{
 				br.setValue(br.getValue()+ntbs);
 			}

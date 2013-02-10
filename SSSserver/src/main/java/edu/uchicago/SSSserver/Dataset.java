@@ -19,6 +19,7 @@ public class Dataset {
 	ArrayList<tree> summedTrees;
 	public int processed;
 
+	// creation of a dataset will just populate path, RootFile list
 	Dataset(String na) {
 		name = na;
 		alRootFiles = new ArrayList<RootFile>();
@@ -71,13 +72,14 @@ public class Dataset {
 			processed++;
 
 			for (tree t : ts) {
-				tree st = getTree(t.getName());
-				st.add(t);
+				getTree(t.getName()).add(t);
 			}
 
 		}
 	}
 
+	// runs dq2-ls -f to get the files of the dataset. (also file sizes.)
+	// than runs dq2-list-files -p in order to get gLFN path.
 	private void queryDQ2() {
 
 		try {

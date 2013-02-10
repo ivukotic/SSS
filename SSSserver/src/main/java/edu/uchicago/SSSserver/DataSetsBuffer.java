@@ -12,6 +12,7 @@ public class DataSetsBuffer {
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
     
 	public DataContainer getContainer(String[] sDSs){
+		logger.info("creating new DataContainer.");
     	DataContainer DC=new DataContainer();
     	for (String ds : sDSs) {
     		DC.add(getDSfromName(ds));
