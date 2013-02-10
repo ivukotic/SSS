@@ -81,6 +81,7 @@ public class Receiver {
 			}
 
 		} catch (Exception e) {
+			logger.error("in GetJob:");
 			logger.error(e.getMessage());
 		}
 
@@ -106,6 +107,7 @@ public class Receiver {
 			cs1.close();
 
 		} catch (Exception e) {
+			logger.error("in getTaskToUpload:");
 			logger.error(e.getMessage());
 		}
 

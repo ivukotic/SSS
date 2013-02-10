@@ -85,7 +85,7 @@ public class Submitter {
 		return jobID;
 	}
 	
-	public void insertSubJob(Integer jobID, String fname, Long size, Long events){
+	public void insertFile(Integer jobID, String fname, Long size, Long events){
 		PreparedStatement statement = null;
 		try {
 			String SQL_INSERT = "INSERT INTO SSS_FILES (JOBID, NAME, FILESIZE, EVENTS) values (?,?,?,?)";
@@ -105,5 +105,23 @@ public class Submitter {
 				} catch (SQLException logOrIgnore) {
 				}
 		}
+		
+		// now setting status to 0 so job is taken by SSSexecutor - initially trigger sets status to -1
+		try {
+			String SQL_UPDATE_STATUS = "update SSS_JOBS set status=0 where jobid=?";
+			statement = conn.prepareStatement(SQL_UPDATE_STATUS);
+			statement.setInt(1, jobID);
+			statement.executeUpdate();
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			if (statement != null)
+				try {
+					statement.close();
+				} catch (SQLException logOrIgnore) {
+				}
+		}
+		
 	}
 }

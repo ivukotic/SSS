@@ -171,7 +171,7 @@ public class DataContainer {
 			for (Dataset ds : dSets) {
 				ArrayList<RootFile> arf = ds.alRootFiles;
 				for (RootFile rf : arf){
-					s.insertSubJob(jobID ,rf.getFullgLFN(), rf.size, rf.getEventsInTree(mainTree)  );
+					s.insertFile(jobID ,rf.getFullgLFN(), rf.size, rf.getEventsInTree(mainTree)  );
 				}
 			}
 		}
