@@ -408,10 +408,12 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
         
         try:
             print 'Executing SSS_FINISH_FILE.'
-            cursor = cx_Oracle.Cursor(connection)
+            connection1 = cx_Oracle.Connection(connline)
+            cursor = cx_Oracle.Cursor(connection1)
             cursor.callproc("SSS_FINISH_FILE", [taskid, nentries, n_pass])
             cursor.close()
-        
+            connection1.commit()
+            connection1.close()
         except cx_Oracle.DatabaseError, exc:
             error, = exc.args
             print "filter-and-merge.py - problem in executing SSS_FINISH_FILE"
@@ -779,11 +781,12 @@ Accepted command line options:
 
     try:
         print 'executing SSS_FINISH_TASK.'
-        cursor = cx_Oracle.Cursor(connection)
+        connection2 = cx_Oracle.Connection(connline)
+        cursor = cx_Oracle.Cursor(connection2)
         cursor.callproc("SSS_FINISH_TASK", [taskid, 4, timer.CpuTime()/timer.RealTime()])
         cursor.close()
-        connection.commit()
-        connection.close()
+        connection2.commit()
+        connection2.close()
     except cx_Oracle.DatabaseError, exc:
         error, = exc.args
         print "filter-and-merge.py - problem in executing SSS_FINISH_TASK."
