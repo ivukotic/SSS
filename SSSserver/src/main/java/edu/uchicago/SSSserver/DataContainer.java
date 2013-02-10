@@ -59,16 +59,17 @@ public class DataContainer {
 		summedTrees.clear();
 
 		for (Dataset ds : dSets) {
-			ArrayList<tree> ts = getTrees(ds);
-			if (ts.size() == 0)
+			ArrayList<tree> treesInDS = getTrees(ds);
+			if (treesInDS.size() == 0)
 				continue;
 
 			processedfiles += ds.processed;
 			totalfiles += ds.alRootFiles.size();
 
-			for (tree t : ts) {
-				tree st = getTree(t.getName());
-				st.add(t);
+			for (tree t : treesInDS) {
+//				tree st = 
+				getTree(t.getName());
+//				summedTrees.add(t);
 			}
 
 		}
