@@ -412,8 +412,8 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
             cursor = cx_Oracle.Cursor(connection1)
             #cursor.callproc("SSS_FINISH_FILE", [taskid, nentries, n_pass])
             cursor.execute("update sss_subjobs set outputevents="+str(n_pass)+", eventsprocessed=eventsprocessed+"+str(nentries)+" where taskid="+str(taskid) )
-            cursor.commit()
             cursor.close()
+            print 'Rows updated: ', cursor.fetchall()[0][0]
             connection1.commit()
             connection1.close()
         except cx_Oracle.DatabaseError, exc:
