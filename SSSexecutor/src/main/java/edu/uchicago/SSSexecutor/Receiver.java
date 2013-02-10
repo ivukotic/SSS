@@ -46,7 +46,7 @@ public class Receiver {
 	}
 
 	public Task getJob() {
-		logger.info("getJob started");
+		logger.debug("getJob started");
 		Task task = new Task();
 		try {
 
@@ -55,7 +55,7 @@ public class Receiver {
 			cs.execute();
 			cs.close();
 
-			logger.info("Tasks were set");
+			logger.debug("Tasks were set");
 			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK(?,?,?,?,?,?,?)}");
 			cs1.registerOutParameter(1, Types.INTEGER);
 			cs1.registerOutParameter(2, Types.VARCHAR);
@@ -84,12 +84,12 @@ public class Receiver {
 			logger.error(e.getMessage());
 		}
 
-		logger.info("getJob done");
+		logger.debug("getJob done");
 		return task;
 	}
 	
 	public Task getTaskToUpload() {
-		logger.info("getTaskToUpload started");
+		logger.debug("getTaskToUpload started");
 		Task task = new Task();
 		try {
 
@@ -109,7 +109,7 @@ public class Receiver {
 			logger.error(e.getMessage());
 		}
 
-		logger.info("getTaskToUpload done");
+		logger.debug("getTaskToUpload done");
 		return task;
 	}
 

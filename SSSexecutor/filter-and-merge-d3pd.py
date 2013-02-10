@@ -409,7 +409,6 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
         try:
             print 'Executing SSS_FINISH_FILE.'
             cursor = cx_Oracle.Cursor(connection)
-            machine=socket.gethostname()
             cursor.callproc("SSS_FINISH_FILE", [taskid, nentries, n_pass])
             cursor.close()
         
@@ -781,7 +780,6 @@ Accepted command line options:
     try:
         print 'executing SSS_FINISH_TASK.'
         cursor = cx_Oracle.Cursor(connection)
-        machine=socket.gethostname()
         cursor.callproc("SSS_FINISH_TASK", [taskid, 4, timer.CpuTime()/timer.RealTime()])
         cursor.close()
         connection.commit()
