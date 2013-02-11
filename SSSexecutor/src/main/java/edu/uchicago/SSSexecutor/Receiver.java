@@ -3,6 +3,7 @@ package edu.uchicago.SSSexecutor;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,14 +18,27 @@ public class Receiver {
 
 	private Connection conn;
 	private final String dbhost = "intr1-v.cern.ch:10121/intr.cern.ch";
-	private final String dbusername = "ATLAS_WANHCTEST";
-	private final String dbpass = "wanhctest1";
 
 	Receiver() {
 		conn = null;
 	}
 
 	public void connect() {
+
+		logger.info("connecting to ORACLE server ...");
+		
+		String dbusername = System.getenv("dbusername");
+		if (dbusername == null) {
+			logger.info("no dbusername defined. Please set it.");
+			System.exit(1);
+		}
+		
+		String dbpass = System.getenv("dbpass");
+		if (dbpass == null) {
+			logger.info("no dbpass defined. Please set it.");
+			System.exit(1);
+		}
+		
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@//" + dbhost, dbusername, dbpass);
@@ -37,13 +51,6 @@ public class Receiver {
 
 	}
 
-	public void disconnect() {
-		if (conn != null)
-			try {
-				conn.close();
-			} catch (SQLException logOrIgnore) {
-			}
-	}
 
 	public Task getJob() {
 		logger.debug("getJob started");
@@ -115,4 +122,18 @@ public class Receiver {
 		return task;
 	}
 
+	public void setPutStatus(Integer size, Integer taskid){
+		logger.debug("updating dq2-put size");
+
+		String updateString="UPDATE SSS_SUBJOBS SET status=6, OUTPUTSIZE="+size.toString()+" WHERE taskid="+taskid.toString();
+		try {
+			PreparedStatement updatePut = conn.prepareStatement(updateString);
+			updatePut.executeUpdate();
+			conn.commit();
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+		}
+		
+	}
 }

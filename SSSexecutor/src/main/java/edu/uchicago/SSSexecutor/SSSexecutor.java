@@ -24,17 +24,13 @@ public class SSSexecutor {
 			logger.error(ex.getMessage());
 		}
 		
-		logger.info("Setting up dq2 environment ...");
-
-		logger.info("connecting to ORACLE server ...");
-
+		Receiver r = new Receiver();
+		r.connect();
+		
 		while (true) {
 			logger.info("----------------");
-			Receiver r = new Receiver();
-			r.connect();
 			Task task = r.getJob();
 			Task taskToUpload=r.getTaskToUpload();
-			r.disconnect();
 			if (task.id > 0 ) {
 				task.print();
 				CondorSubmitter s = new CondorSubmitter();
@@ -42,7 +38,8 @@ public class SSSexecutor {
 			} else if(taskToUpload.id >0){
 				taskToUpload.print();
 				Dq2Puter dq2=new Dq2Puter();
-				dq2.put(taskToUpload);
+				Integer putsize=dq2.put(taskToUpload);
+				r.setPutStatus(putsize,taskToUpload.id);
 			}
 			else {
 				try {
@@ -51,6 +48,8 @@ public class SSSexecutor {
 				}
 			}
 		}
+
+		
 	}
 
 }
