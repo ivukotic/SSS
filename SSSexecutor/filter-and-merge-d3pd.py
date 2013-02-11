@@ -410,7 +410,6 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
             print 'Executing SSS_FINISH_FILE.'
             connection1 = cx_Oracle.Connection(connline)
             cursor = cx_Oracle.Cursor(connection1)
-            #cursor.callproc("SSS_FINISH_FILE", [taskid, nentries, n_pass])
             cursor.execute("update sss_subjobs set outputevents="+str(n_pass)+", eventsprocessed=eventsprocessed+"+str(nentries)+" where taskid="+str(taskid) )
             cursor.close()
             connection1.commit()
@@ -674,7 +673,8 @@ Accepted command line options:
 
     #********************************************************* ILIJA instrumentation
 
-
+    global taskid
+    global jobid
     try:
         print 'Executing SSS_START_TASK.'
         cursor = cx_Oracle.Cursor(connection)
