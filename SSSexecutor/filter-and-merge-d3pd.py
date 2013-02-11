@@ -659,6 +659,8 @@ Accepted command line options:
         for grl_fname in opts.grl_fname:
             grl_fnames.extend(glob(grl_fname))
         opts.grl_fname = grl_fnames
+    
+    opts.maxsize=10240
         
     print "::: input files:   ",opts.input_files
     print "::: output file:   ",opts.output_file
