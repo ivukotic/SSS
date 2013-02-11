@@ -2,11 +2,14 @@ package edu.uchicago.SSSexecutor;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.InputStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+
 
 public class Dq2Puter {
 
@@ -14,11 +17,18 @@ public class Dq2Puter {
 
 	void put(Task task) {
 		logger.info("Creating dq2-put script to execute.");
+		
 		String fn = "SSS_uploader_" + task.id + ".sh";
 		try { // script to execute
-			FileWriter fstream = new FileWriter(fn);
-			BufferedWriter out = new BufferedWriter(fstream);
-			String res = "#!/bin/zsh\n";
+
+			Path path = FileSystems.getDefault().getPath(".", fn);
+			path.toFile().setExecutable(true);
+		    BufferedWriter out = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+		    
+//			FileWriter fstream = new FileWriter(fn);
+//			BufferedWriter out = new BufferedWriter(fstream);
+			
+		    String res = "#!/bin/zsh\n";
 			res += "export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --dq2ClientVersion current --skipConfirm\n";
