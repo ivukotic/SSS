@@ -22,11 +22,12 @@ public class Dq2Puter {
 			res += "export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --dq2ClientVersion current --skipConfirm\n";
+			res += "export DQ2_LOCAL_SITE_ID=MWT2_UC_USERDISK\n";
 			res += "export X509_USER_PROXY=x509up_u20074\n";
 			res += "dq2-put -C -a -f "+task.outFile;
 			if ( task.deliverTo != null)
 				res += " -L" + fn + task.deliverTo;
-			res += " "+task.dataset+"\n";
+			res += " "+"user.ivukotic.SSS."+task.dataset+"\n";
 			out.write(res);
 			out.close();
 		} catch (Exception ex) {
@@ -36,21 +37,21 @@ public class Dq2Puter {
 		
 		// start it
 		Runtime rt = Runtime.getRuntime();
-		String[] comm = { fn };
+		String[] comm = { "./"+fn };
 		try {
 			Process proc = rt.exec(comm);
 
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
-			// read the output from the submit command
+			// read the output from the dq2-put shell script
 			logger.info("start output:\n");
 			String s;
 			while ((s = stdInput.readLine()) != null) {
 				logger.info(s);
 			}
 
-			// read any errors from the submit command
+			// read any errors from the dq2-put shell script
 			while ((s = stdError.readLine()) != null) {
 				logger.error("there is an error from start command...");
 				logger.error(s);
