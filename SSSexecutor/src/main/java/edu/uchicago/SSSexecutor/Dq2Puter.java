@@ -14,7 +14,8 @@ public class Dq2Puter {
 
 	final Logger logger = LoggerFactory.getLogger(Dq2Puter.class);
 
-	Integer put(Task task) {
+//	Integer 
+	void put(Task task) {
 		logger.info("Creating dq2-put script to execute.");
 
 		String fn = "SSS_uploader_" + task.id + ".sh";
@@ -45,41 +46,41 @@ public class Dq2Puter {
 			logger.error(ex.getMessage());
 		}
 
-		// start it
-		Runtime rt = Runtime.getRuntime();
-		String[] comm = { "./" + fn };
-		try {
-			Process proc = rt.exec(comm);
-
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-			BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-
-			String s;
-			// read any errors from the dq2-put shell script
-			while ((s = stdError.readLine()) != null) {
-				logger.error("there is an error from dq2-put command...");
-				logger.error(s);
-			}
-
-			// read the output from the dq2-put shell script
-			logger.info("start output:\n");
-			String siz = "";
-			while ((s = stdInput.readLine()) != null) {
-				logger.info(s);
-				if (s.contains("to SE: OK")) {
-					siz = s.substring(s.indexOf("size:") + 5, s.indexOf(")"));
-				}
-			}
-			if (siz.length() > 0) {
-				logger.info("dq2-put was successful. File size is: " + siz);
-				return Integer.parseInt(siz);
-			}
-
-		} catch (Exception ex) {
-			logger.error(ex.getMessage());
-		}
-
-		return 0;
+//		// start it
+//		Runtime rt = Runtime.getRuntime();
+//		String[] comm = { "./" + fn };
+//		try {
+//			Process proc = rt.exec(comm);
+//
+//			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+//			BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+//
+//			String s;
+//			// read any errors from the dq2-put shell script
+//			while ((s = stdError.readLine()) != null) {
+//				logger.error("there is an error from dq2-put command...");
+//				logger.error(s);
+//			}
+//
+//			// read the output from the dq2-put shell script
+//			logger.info("start output:\n");
+//			String siz = "";
+//			while ((s = stdInput.readLine()) != null) {
+//				logger.info(s);
+//				if (s.contains("to SE: OK")) {
+//					siz = s.substring(s.indexOf("size:") + 5, s.indexOf(")"));
+//				}
+//			}
+//			if (siz.length() > 0) {
+//				logger.info("dq2-put was successful. File size is: " + siz);
+//				return Integer.parseInt(siz);
+//			}
+//
+//		} catch (Exception ex) {
+//			logger.error(ex.getMessage());
+//		}
+//
+//		return 0;
 
 	}
 }

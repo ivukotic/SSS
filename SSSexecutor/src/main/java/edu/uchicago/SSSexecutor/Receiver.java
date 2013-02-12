@@ -63,7 +63,7 @@ public class Receiver {
 			cs.close();
 
 			logger.debug("Tasks were set");
-			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK(?,?,?,?,?,?,?)}");
+			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK(?,?,?,?,?,?,?,?)}");
 			cs1.registerOutParameter(1, Types.INTEGER);
 			cs1.registerOutParameter(2, Types.VARCHAR);
 			cs1.registerOutParameter(3, Types.VARCHAR);
@@ -71,6 +71,7 @@ public class Receiver {
 			cs1.registerOutParameter(5, Types.VARCHAR);
 			cs1.registerOutParameter(6, Types.VARCHAR);
 			cs1.registerOutParameter(7, Types.VARCHAR);
+			cs1.registerOutParameter(8, Types.VARCHAR);
 
 			cs1.executeQuery();
 			task.id = cs1.getInt(1);
@@ -79,7 +80,8 @@ public class Receiver {
 			task.cut = cs1.getString(4);
 			task.tree = cs1.getString(5);
 			task.treesToCopy = cs1.getString(6);
-			task.deliverTo = cs1.getString(7);
+			task.dataset = cs1.getString(7);
+			task.deliverTo = cs1.getString(8);
 
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT name from SSS_FILES where taskid=" + task.id.toString());
@@ -96,44 +98,44 @@ public class Receiver {
 		return task;
 	}
 	
-	public Task getTaskToUpload() {
-		logger.debug("getTaskToUpload started");
-		Task task = new Task();
-		try {
-
-			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK_TO_UPLOAD(?,?,?,?)}");
-			cs1.registerOutParameter(1, Types.INTEGER);
-			cs1.registerOutParameter(2, Types.VARCHAR);
-			cs1.registerOutParameter(3, Types.VARCHAR);
-			cs1.registerOutParameter(4, Types.VARCHAR);
-			cs1.executeQuery();
-			task.id = cs1.getInt(1);
-			task.outFile = cs1.getString(2);
-			task.dataset = cs1.getString(3);
-			task.deliverTo = cs1.getString(4);
-			cs1.close();
-
-		} catch (Exception e) {
-			logger.error("in getTaskToUpload:");
-			logger.error(e.getMessage());
-		}
-
-		logger.debug("getTaskToUpload done");
-		return task;
-	}
-
-	public void setPutStatus(Integer size, Integer taskid){
-		logger.debug("updating dq2-put size");
-
-		String updateString="UPDATE SSS_SUBJOBS SET status=6, OUTPUTSIZE="+size.toString()+" WHERE taskid="+taskid.toString();
-		try {
-			PreparedStatement updatePut = conn.prepareStatement(updateString);
-			updatePut.executeUpdate();
-			conn.commit();
-		} catch (SQLException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-		
-	}
+//	public Task getTaskToUpload() {
+//		logger.debug("getTaskToUpload started");
+//		Task task = new Task();
+//		try {
+//
+//			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK_TO_UPLOAD(?,?,?,?)}");
+//			cs1.registerOutParameter(1, Types.INTEGER);
+//			cs1.registerOutParameter(2, Types.VARCHAR);
+//			cs1.registerOutParameter(3, Types.VARCHAR);
+//			cs1.registerOutParameter(4, Types.VARCHAR);
+//			cs1.executeQuery();
+//			task.id = cs1.getInt(1);
+//			task.outFile = cs1.getString(2);
+//			task.dataset = cs1.getString(3);
+//			task.deliverTo = cs1.getString(4);
+//			cs1.close();
+//
+//		} catch (Exception e) {
+//			logger.error("in getTaskToUpload:");
+//			logger.error(e.getMessage());
+//		}
+//
+//		logger.debug("getTaskToUpload done");
+//		return task;
+//	}
+//
+//	public void setPutStatus(Integer size, Integer taskid){
+//		logger.debug("updating dq2-put size");
+//
+//		String updateString="UPDATE SSS_SUBJOBS SET status=6, OUTPUTSIZE="+size.toString()+" WHERE taskid="+taskid.toString();
+//		try {
+//			PreparedStatement updatePut = conn.prepareStatement(updateString);
+//			updatePut.executeUpdate();
+//			conn.commit();
+//		} catch (SQLException e) {
+//			logger.error(e.getMessage());
+//			e.printStackTrace();
+//		}
+//		
+//	}
 }

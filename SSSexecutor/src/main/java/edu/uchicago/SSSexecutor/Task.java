@@ -93,8 +93,11 @@ public class Task {
 			res += "source $AtlasSetup/scripts/asetup.sh 17.6.0,noTest\n";
 //			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
 			res += "export X509_USER_PROXY=x509up_u20074\n";
+			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --dq2ClientVersion current --skipConfirm\n";
+			res += "export DQ2_LOCAL_SITE_ID=MWT2_UC_USERDISK\n";
 			res += "python filter-and-merge-d3pd.py ";
 			res += " --in=" + fn + "inputFileList";
+			res += " --outDS="+dataset;
 			res += " --out=" + outFile;
 			res += " --tree=" + tree;
 			res += " --var=" + fn + "branchesList";

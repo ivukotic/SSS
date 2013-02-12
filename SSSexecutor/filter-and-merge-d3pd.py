@@ -15,6 +15,7 @@ import PyCintex; PyCintex.Cintex.Enable()
 
 import cx_Oracle
 import socket
+import subprocess
 
 # root globals to prevent ROOT garbage collector to sweep the rug....
 _root_files = []
@@ -552,9 +553,9 @@ def main():
     global _root_files, _root_trees
     
     _opts = []
-    _useropts = "i:o:t:m:s:h"
+    _useropts = "i:d:o:t:m:s:h"
     _userlongopts = [
-        "in=", "out=", "tree=", "var=", "maxsize=", "grl=", "fakeout",
+        "in=","outDS=", "out=", "tree=", "var=", "maxsize=", "grl=", "fakeout",
         "selection=",
         "keep-all-trees",
         "help"
@@ -562,6 +563,7 @@ def main():
     _error_msg = """\
 Accepted command line options:
  -i, --in=<INFNAME>                   ...  file containing the list of input files
+ -d, --outDS=<OUTPUT DS>                  ...  output dataset
  -o, --out=<OUTFNAME>                 ...  output file name
  -t, --tree=<TREENAME>                ...  name of the tree to be filtered.
                                            other trees won't be copied by default
@@ -595,6 +597,7 @@ Accepted command line options:
     opts = Options()
     opts.maxsize = 1800
     opts.output_file = None
+    opts.output_ds = None
     opts.vars_fname = None
     opts.grl_fname = None
     opts.fake_output = False
@@ -611,7 +614,10 @@ Accepted command line options:
     for opt,arg in optlist:
         if opt in ("-i", "--in"):
             opts.input_files = arg
-
+        
+        elif opt in ("-d","--outDS"):
+            opts.output_ds = arg
+            
         elif opt in ("-o", "--out"):
             opts.output_file = arg
 
@@ -664,6 +670,7 @@ Accepted command line options:
         
     print "::: input files:   ",opts.input_files
     print "::: output file:   ",opts.output_file
+    print "::: output dataset:",opts.output_ds
     print "::: vars fname:    ",opts.vars_fname
     print "::: tree name:     ",opts.tree_name
     print "::: GRL file:      ",opts.grl_fname
@@ -808,12 +815,43 @@ Accepted command line options:
     # fname_pattern = osp.splitext(opts.output_file)[0]
     # # re-order all output files (in case they were split off)
     # fnames= sorted(glob.glob(fname_pattern + "*.root"))
-    # order(m=2,
-    #       chain_name=opts.tree_name,
-    #       fnames=fnames,
-    #       workdir=workdir)
+    # order(m=2, chain_name=opts.tree_name, fnames=fnames, workdir=workdir)
     # print "::: performing re-ordering... [done]"
 
+
+    print " checking if the file is OK. "
+    fsize=0
+    try:
+        fsize=os.path.getsize(opts.output_file)
+    except os.error:
+        print 'file is not there or not accessible'
+        
+    # running dq2-put on it
+    if fsize>0:
+        try:
+            p = subprocess.Popen(["dq2-put", "-C", "-a", "-f", opts.output_file, "user.ivukotic.SSS."+opts.output_ds], stdout=subprocess.PIPE)
+            out = p.communicate()[0]
+            if line.count('OK (size:'+str(fsize)+')')==0:
+                fsize=0
+        except e:
+            print e
+        
+    # udpating Oracle db
+    try:
+        print 'Final DB update .'
+        connection3 = cx_Oracle.Connection(connline)
+        cursor = cx_Oracle.Cursor(connection3)
+        cursor.execute("update sss_subjobs set status=5, outputsize="+str(fsize)+" where taskid="+str(taskid) )
+        cursor.close()
+        connection3.commit()
+        connection3.close()
+    except cx_Oracle.DatabaseError, exc:
+        error, = exc.args
+        print "filter-and-merge.py - problem in Final DB update"
+        print "filter-and-merge.py Oracle-Error-Code:", error.code
+        print "filter-and-merge.py Oracle-Error-Message:", error.message    
+    
+    
     print "::: bye."
     print ":"*80
     return 0
