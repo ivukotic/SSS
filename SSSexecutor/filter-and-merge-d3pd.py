@@ -823,20 +823,22 @@ Accepted command line options:
     fsize=0
     try:
         fsize=os.path.getsize(opts.output_file)
+        print 'file '+opts.output_file+'is  there. Its size: '+str(fsize)
     except os.error:
         print 'file is not there or not accessible'
         
-    # running dq2-put on it
+    print "running dq2-put on it"
     if fsize>0:
         try:
             p = subprocess.Popen(["dq2-put", "-C", "-a", "-f", opts.output_file, "user.ivukotic.SSS."+opts.output_ds], stdout=subprocess.PIPE)
             out = p.communicate()[0]
-            if line.count('OK (size:'+str(fsize)+')')==0:
+            print out
+            if out.count('OK (size:'+str(fsize)+')')==0:
                 fsize=0
-        except e:
-            print e
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
         
-    # udpating Oracle db
+    print "udpating Oracle db"
     try:
         print 'Final DB update .'
         connection3 = cx_Oracle.Connection(connline)
