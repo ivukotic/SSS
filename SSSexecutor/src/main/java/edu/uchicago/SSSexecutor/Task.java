@@ -91,7 +91,6 @@ public class Task {
 			res += "export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source $AtlasSetup/scripts/asetup.sh 17.6.0,noTest\n";
-//			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current\n";
 			res += "export X509_USER_PROXY=x509up_u20074\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --dq2ClientVersion current --skipConfirm\n";
 			res += "export DQ2_LOCAL_SITE_ID=MWT2_UC_USERDISK\n";
