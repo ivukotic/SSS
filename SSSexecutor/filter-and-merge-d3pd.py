@@ -835,6 +835,9 @@ Accepted command line options:
             print out
             if out.count('OK (size:'+str(fsize)+')')==0:
                 fsize=0
+            else:
+                print 'successful dq2-put. deleting the file.'
+                rmp = subprocess.Popen(["rm -rf",opts.output_file])
         except:
             print "Unexpected error:", sys.exc_info()[0]
         
