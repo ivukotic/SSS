@@ -24,6 +24,8 @@ _root_trees = []
 taskid=0
 jobid=0
 connline=''
+
+print 'reading connection parameters'
 with open('.OracleAccess.txt', 'r') as f: 
     lines=f.readlines()
     for connline in lines:
@@ -31,6 +33,7 @@ with open('.OracleAccess.txt', 'r') as f:
             break
     f.close()
 
+print 'opening connection'
 connection=None
 try:
     connection = cx_Oracle.Connection(connline)
@@ -39,6 +42,8 @@ except cx_Oracle.DatabaseError, exc:
     print "filter-and-merge.py - problem in establishing connection to db"
     print "filter-and-merge.py Oracle-Error-Code:", error.code
     print "filter-and-merge.py Oracle-Error-Message:", error.message
+
+print 'connection opened'
     
 # Root has a global dtor ordering problem: the cintex trampolines
 # may be deleted before open files are closed.  Workaround is to explicitly
