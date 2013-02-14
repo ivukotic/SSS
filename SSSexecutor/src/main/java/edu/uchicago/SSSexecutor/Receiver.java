@@ -83,18 +83,25 @@ public class Receiver {
 			task.deliverTo = cs1.getString(8);
 			cs1.close();
 			
+		} catch (SQLException sqle) {
+			logger.error("in getJob SSS_GET_TASK:"+sqle.getMessage());
+		} catch (Exception e) {
+			logger.error("in getJob SSS_GET_TASK:"+e.getMessage());
+		}
+
+		try {
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT name from SSS_FILES where taskid=" + task.id.toString());
 			while (rs.next()) {
 				task.inputFiles.add(rs.getString(1));
 			}
 			stmt.close();
-
+		} catch (SQLException sqle) {
+			logger.error("in getJob SELECT"+sqle.getMessage());
 		} catch (Exception e) {
-			logger.error("in GetJob:");
-			logger.error(e.getMessage());
+			logger.error("in getJob SELECT:"+e.getMessage());
 		}
-
+		
 		logger.debug("getJob done");
 		return task;
 	}

@@ -94,6 +94,7 @@ public class Task {
 			res += "export X509_USER_PROXY=x509up_u20074\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --dq2ClientVersion current --skipConfirm\n";
 			res += "export DQ2_LOCAL_SITE_ID=MWT2_UC_USERDISK\n";
+			res += "python -V\n";
 			res += "python filter-and-merge-d3pd.py ";
 			res += " --in=" + fn + "inputFileList";
 			res += " --outDS="+dataset;
