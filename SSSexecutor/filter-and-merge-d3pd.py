@@ -11,7 +11,10 @@ import atexit
 
 # 3rd party imports
 import ROOT
-import PyCintex; PyCintex.Cintex.Enable()
+import PyCintex
+
+print 'enabling pycintex'
+PyCintex.Cintex.Enable()
 
 import cx_Oracle
 import socket
