@@ -557,7 +557,7 @@ class Options(object):
     pass
 
 def main():
-
+    print 'main'
     global _root_files, _root_trees
     
     _opts = []
