@@ -62,9 +62,9 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 			ChannelBuffer content = request.getContent();
 			if (content.readable()) {
-				logger.info("CONTENT: >" + content.toString(CharsetUtil.UTF_8) + "<");
+				logger.debug("CONTENT: >" + content.toString(CharsetUtil.UTF_8) + "<");
 			} else {
-				logger.error("conten unreadable!!!");
+				logger.error("content unreadable!!!");
 				return;
 			}
 
@@ -145,16 +145,11 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			}
 
 			logger.info("cut code xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			sSplit = pars[4].split("=");
-			if (!sSplit[0].equals("cutCode"))
+			if (!pars[4].startsWith("cutCode="))
 				return;
-			String cutCode = null;
-			if (sSplit.length == 1) {
-				logger.info("No cut code.");
-			} else {
-				cutCode = sSplit[1];
-				logger.info("cut code: " + cutCode);
-			}
+			String cutCode = pars[4].substring(8);
+			logger.info("cut code: " + cutCode);
+			
 			buf.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
 			// ==================================================
 
