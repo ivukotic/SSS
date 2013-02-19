@@ -101,7 +101,7 @@ public class Task {
 			res += " --tree=" + tree;
 			res += " --var=" + fn + "branchesList";
 			if (cut != null)
-				res += " --selection=" + fn + "cutCode";
+				res += " --selection=file:" + fn + "cutCode";
 			if (treesToCopy != null)
 				res += " --keep-all-trees";
 			out.write(res);
