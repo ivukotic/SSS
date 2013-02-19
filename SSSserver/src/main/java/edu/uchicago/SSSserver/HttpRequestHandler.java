@@ -46,7 +46,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		logger.info("MessageReceived.");
-		logger.debug("Message: " + e.toString());
+//		logger.info("Message: " + e.toString());
 
 		dSets.clear();
 

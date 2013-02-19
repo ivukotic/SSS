@@ -49,7 +49,7 @@ public class Submitter {
 		Integer jobID=0;
 		PreparedStatement statement = null;
 		try {
-			String SQL_INSERT = "INSERT INTO SSS_JOBS (OUTDATASET,BRANCHES,CUT,TREE,TREESTOKEEP,INDATASETS,DELIVERTO,INPUTEVENTS,INPUTSIZE,OUTPUTSIZE,OUTPUTEVENTS) values (?,?,?,?,?,?,?,?,?,?,?)";
+			String SQL_INSERT = "INSERT INTO SSS_JOBS (OUTDATASET,CBRANCHES,CCUT,TREE,TREESTOKEEP,INDATASETS,DELIVERTO,INPUTEVENTS,INPUTSIZE,OUTPUTSIZE,OUTPUTEVENTS) values (?,?,?,?,?,?,?,?,?,?,?)";
 			statement = conn.prepareStatement(SQL_INSERT);
 			statement.setString(1, outdataset);
 			statement.setString(2, branches);

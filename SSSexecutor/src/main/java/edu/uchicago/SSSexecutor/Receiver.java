@@ -65,8 +65,8 @@ public class Receiver {
 			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK(?,?,?,?,?,?,?,?)}");
 			cs1.registerOutParameter(1, Types.INTEGER);
 			cs1.registerOutParameter(2, Types.VARCHAR);
-			cs1.registerOutParameter(3, Types.VARCHAR);
-			cs1.registerOutParameter(4, Types.VARCHAR);
+			cs1.registerOutParameter(3, Types.CLOB);
+			cs1.registerOutParameter(4, Types.CLOB);
 			cs1.registerOutParameter(5, Types.VARCHAR);
 			cs1.registerOutParameter(6, Types.VARCHAR);
 			cs1.registerOutParameter(7, Types.VARCHAR);
