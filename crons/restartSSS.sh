@@ -14,24 +14,19 @@ then
 	ps -p $proc | grep java
 	if [ $? -eq 0 ]
 	then
-		echo "process exists. doing nothing."
+		echo "process exists. doing nothing." 
+        exit 0
 	else
-		echo "process does not exist. restarting."
-        	source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current
-		cd ~/SSS/SSSserver
-    		export STORAGEPREFIX=root://glrd.usatlas.org/
-    		make
-    		java -Dorg.slf4j.simpleLogger.defaultLogLevel=info -jar target/SSSserver-1.0-jar-with-dependencies.jar &
-		echo "process restarted"
+		echo "process does not exist. removing proc file."
+        rm /tmp/.SSSserver.proc
 	fi
+fi    
 
-else
-	echo "file /tmp/.SSSserver.proc not found. starting SSSserver. "
-        source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current
-        cd ~/SSS/SSSserver
-        export STORAGEPREFIX=root://glrd.usatlas.org/
-        make
-        java -Dorg.slf4j.simpleLogger.defaultLogLevel=info -jar target/SSSserver-1.0-jar-with-dependencies.jar &
-	echo "process started"
-fi
+echo "file /tmp/.SSSserver.proc not found. starting SSSserver. "
+source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current
+cd ~/SSS/SSSserver
+export STORAGEPREFIX=root://glrd.usatlas.org/
+make
+java -Dorg.slf4j.simpleLogger.defaultLogLevel=info -jar target/SSSserver-1.0-jar-with-dependencies.jar &
+echo "process started"
 
