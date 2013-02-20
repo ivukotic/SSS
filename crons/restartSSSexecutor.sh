@@ -15,6 +15,8 @@ then
 fi
 
 export HOME=/home/ivukotic
+export dbusername=...
+export dbpass=...
 
 export SSS_UNIVERSE=vanilla
 export SSS_REQUIREMENTS='(UidDomain == "osg-gk.mwt2.org") &&  ( regexp("^uc3.*", TARGET.Machine,"IM") == True )'

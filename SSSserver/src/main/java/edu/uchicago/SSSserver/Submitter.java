@@ -16,14 +16,26 @@ public class Submitter {
 
 	private Connection conn;
 	private final String dbhost = "intr1-v.cern.ch:10121/intr.cern.ch";
-	private final String dbusername = "ATLAS_WANHCTEST";
-	private final String dbpass = "wanhctest1";
 
 	Submitter() {
 		conn = null;
 	}
 
 	public void connect() {
+		logger.info("connecting to ORACLE server ...");
+		
+		String dbusername = System.getenv("dbusername");
+		if (dbusername == null) {
+			logger.info("no dbusername defined. Please set it.");
+			System.exit(1);
+		}
+		
+		String dbpass = System.getenv("dbpass");
+		if (dbpass == null) {
+			logger.info("no dbpass defined. Please set it.");
+			System.exit(1);
+		}
+		
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@//" + dbhost, dbusername, dbpass);

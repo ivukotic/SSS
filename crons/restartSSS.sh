@@ -1,5 +1,7 @@
 export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
 export HOME=/home/ivukotic
+export dbusername=...
+export dbpass=...
 
 source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
 source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --skipConfirm --dq2ClientVersion current
