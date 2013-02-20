@@ -95,6 +95,11 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			DataContainer DC = DSB.getContainer(dss);
 
 			long totsize = DC.getInputSize();
+			if (totsize<0) {
+				buf.append("warning:at least one of the datasets does not exist, or has no root files.");
+				writeResponse(e);
+				return;
+			}
 			buf.append("size:" + String.valueOf(totsize) + "\n");
 			buf.append(DC.getTreeDetails());
 
