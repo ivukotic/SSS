@@ -36,6 +36,7 @@ public class Dataset {
 	}
 
 	public Long getSize() {
+		if (alRootFiles.isEmpty()) return -1L;
 		size = 0;
 		for (RootFile rf : alRootFiles) {
 			size += rf.size;
@@ -105,7 +106,10 @@ public class Dataset {
 				logger.error("Problem with 'dq2-ls -f'. Exited with code " + exitVal);
 				return;
 			}
-
+			if (alRootFiles.isEmpty()){
+				logger.error("no root files recognized in the output of dq2-ls -f  ");
+				return;
+			}
 			// get gLFN path
 			comm = "dq2-list-files -p " + name;
 			logger.info("executing >" + comm + "<");

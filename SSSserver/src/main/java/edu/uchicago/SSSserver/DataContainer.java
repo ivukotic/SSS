@@ -28,6 +28,7 @@ public class DataContainer {
 	public long getInputSize() {
 		long res = 0;
 		for (Dataset ds : dSets) {
+			if (ds.getSize()==-1) return -1L;
 			res += ds.getSize();
 		}
 		if (res > 0)
