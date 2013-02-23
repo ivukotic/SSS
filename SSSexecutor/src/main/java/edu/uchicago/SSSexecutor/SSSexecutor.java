@@ -16,11 +16,7 @@ public class SSSexecutor {
 	private static Integer getNumberOfIdleJobs() {
 		Integer idlejobs = 0;
 		Runtime rt = Runtime.getRuntime();
-		String[] comm = {
-				"/bin/sh",
-				"-c",
-				"condor_q " + System.getProperty("user.name") + " | grep \" I \" | wc -l"
-				};
+		String[] comm = { "/bin/sh", "-c", "condor_q " + System.getProperty("user.name") + " | grep \" I \" | wc -l" };
 
 		try {
 			Process proc = rt.exec(comm);
@@ -29,11 +25,10 @@ public class SSSexecutor {
 			BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
 			// read the output from the submit command
-			logger.info("idle jobs: ");
 			String s = stdInput.readLine();
-			logger.info(s);
-			idlejobs=Integer.parseInt(s);
-			
+			logger.info("idle jobs: " + s);
+			idlejobs = Integer.parseInt(s);
+
 			// read any errors from the submit command
 			while ((s = stdError.readLine()) != null) {
 				logger.error("there is an error from command lookign for idle jobs...");
@@ -44,6 +39,14 @@ public class SSSexecutor {
 			logger.error(ex.getMessage());
 		}
 		return idlejobs;
+	}
+
+	public static void waitAminute() {
+		try {
+			logger.info("----------------");
+			Thread.currentThread().sleep(60000);
+		} catch (Exception e) {
+		}
 	}
 
 	public static void main(String[] args) {
@@ -63,7 +66,6 @@ public class SSSexecutor {
 		r.connect();
 
 		while (true) {
-			logger.info("----------------");
 
 			// first check number of idle jobs for this user
 			if (getNumberOfIdleJobs() < 2) {
@@ -73,14 +75,11 @@ public class SSSexecutor {
 					task.print();
 					CondorSubmitter s = new CondorSubmitter();
 					s.submit(task);
-				} else {
-					try {
-						Thread.currentThread().sleep(60000);
-					} catch (Exception e) {
-					}
-				}
-				
-			}
+				} else 
+					waitAminute();
+
+			}else
+				waitAminute();
 		}
 
 	}
