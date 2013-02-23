@@ -16,7 +16,12 @@ public class SSSexecutor {
 	private static Integer getNumberOfIdleJobs() {
 		Integer idlejobs = 0;
 		Runtime rt = Runtime.getRuntime();
-		String[] comm = { "condor_q", System.getProperty("user.name")+" | grep \" I \" | wc -l" };
+		String[] comm = {
+				"/bin/sh",
+				"-c",
+				"condor_q " + System.getProperty("user.name") + " | grep \" I \" | wc -l"
+				};
+
 		try {
 			Process proc = rt.exec(comm);
 
