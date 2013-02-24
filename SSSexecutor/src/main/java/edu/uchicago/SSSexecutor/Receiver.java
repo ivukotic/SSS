@@ -17,6 +17,7 @@ public class Receiver {
 
 	private Connection conn;
 	private final String dbhost = "intr1-v.cern.ch:10121/intr.cern.ch";
+	private CallableStatement cs;
 
 	Receiver() {
 		conn = null;
@@ -25,19 +26,19 @@ public class Receiver {
 	public void connect() {
 
 		logger.info("connecting to ORACLE server ...");
-		
+
 		String dbusername = System.getenv("dbusername");
 		if (dbusername == null) {
 			logger.info("no dbusername defined. Please set it.");
 			System.exit(1);
 		}
-		
+
 		String dbpass = System.getenv("dbpass");
 		if (dbpass == null) {
 			logger.info("no dbpass defined. Please set it.");
 			System.exit(1);
 		}
-		
+
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@//" + dbhost, dbusername, dbpass);
@@ -48,8 +49,13 @@ public class Receiver {
 			logger.error(e.getMessage());
 		}
 
-	}
+		try {
+			cs = conn.prepareCall("{call SSS_SET_TASK()}");
+		} catch (SQLException e) {
+			logger.error("can't create statement SSS_SET_TASK()" + e.getMessage());
+		}
 
+	}
 
 	public Task getJob() {
 		logger.debug("getJob started");
@@ -57,9 +63,8 @@ public class Receiver {
 		try {
 
 			// this makes sure that all the jobs are split in tasks
-			CallableStatement cs = conn.prepareCall("{call SSS_SET_TASK()}");
 			cs.execute();
-			cs.close();
+			// cs.close();
 
 			logger.debug("Tasks were set");
 			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK(?,?,?,?,?,?,?,?)}");
@@ -82,11 +87,11 @@ public class Receiver {
 			task.dataset = cs1.getString(7);
 			task.deliverTo = cs1.getString(8);
 			cs1.close();
-			
+
 		} catch (SQLException sqle) {
-			logger.error("in getJob SSS_GET_TASK:"+sqle.getMessage());
+			logger.error("in getJob SSS_GET_TASK:" + sqle.getMessage());
 		} catch (Exception e) {
-			logger.error("in getJob SSS_GET_TASK:"+e.getMessage());
+			logger.error("in getJob SSS_GET_TASK:" + e.getMessage());
 		}
 
 		try {
@@ -95,15 +100,16 @@ public class Receiver {
 			while (rs.next()) {
 				task.inputFiles.add(rs.getString(1));
 			}
+			rs.close();
 			stmt.close();
 		} catch (SQLException sqle) {
-			logger.error("in getJob SELECT"+sqle.getMessage());
+			logger.error("in getJob SELECT" + sqle.getMessage());
 		} catch (Exception e) {
-			logger.error("in getJob SELECT:"+e.getMessage());
+			logger.error("in getJob SELECT:" + e.getMessage());
 		}
-		
+
 		logger.debug("getJob done");
 		return task;
 	}
-	
+
 }

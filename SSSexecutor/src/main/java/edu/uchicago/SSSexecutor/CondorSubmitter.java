@@ -49,7 +49,14 @@ public class CondorSubmitter implements Submitter {
 			} else {
 				res += "Requirements =  " + value + "\n";
 			}
-
+			
+			value = System.getenv("SSS_EXTRA_CONDOR_SETTINGS");
+			if (value == null) {
+				logger.warn("no SSS_EXTRA_CONDOR_SETTINGS defined. If needed please set variable SSS_EXTRA_CONDOR_SETTINGS");
+			} else {
+				res +=  value + "\n";
+			}
+			
 			res += "Queue  1";
 
 			out.write(res);
