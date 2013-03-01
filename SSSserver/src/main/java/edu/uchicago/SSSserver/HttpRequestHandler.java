@@ -88,7 +88,13 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 			if (!sSplit[0].equals("inds"))
 				return;
-
+			
+			if (true){
+				Thread.sleep(500000);
+//				writeResponse(e);
+				return;
+			}
+			
 			logger.info("inds: " + sSplit[1]);
 			String[] dss = sSplit[1].split(",");
 
@@ -105,11 +111,6 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			
 			buf.append("size:" + String.valueOf(totsize) + "\n");
 			buf.append(treeDetails);
-
-			if (true){
-				writeResponse(e);
-				return;
-			}
 			
 			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
