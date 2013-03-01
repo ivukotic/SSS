@@ -20,6 +20,9 @@ public class Dataset {
 	ArrayList<tree> summedTrees;
 	public int processed;
 
+	boolean started;
+	boolean done;
+	
 	// creation of a dataset will just populate path, RootFile list
 	Dataset(String na) {
 		name = na;
@@ -30,6 +33,8 @@ public class Dataset {
 
 		DQ2runner dqr = new DQ2runner();
 		dqr.start();
+		started = true;
+		done = false;
 	}
 
 	private void setPath(String pat) {
@@ -40,6 +45,7 @@ public class Dataset {
 	}
 
 	public Long getSize() {
+		if (done==false) return 0L;
 		if (alRootFiles.isEmpty()) return -1L;
 		size = 0;
 		for (RootFile rf : alRootFiles) {
@@ -107,10 +113,12 @@ public class Dataset {
 				int exitVal = pr.waitFor();
 				if (exitVal != 0) {
 					logger.error("Problem with 'dq2-ls -f'. Exited with code " + exitVal);
+					done = true;
 					return;
 				}
 				if (alRootFiles.isEmpty()){
 					logger.error("no root files recognized in the output of dq2-ls -f  ");
+					done = true;
 					return;
 				}
 				// get gLFN path
@@ -132,6 +140,7 @@ public class Dataset {
 					setPath(line);
 				}
 				logger.debug("dq2-list-files finished OK.");
+				done = true;
 			} catch (Exception e) {
 				logger.error("unrecognized exception: " + e.getMessage());
 			}
