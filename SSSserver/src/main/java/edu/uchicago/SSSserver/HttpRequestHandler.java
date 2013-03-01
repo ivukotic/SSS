@@ -89,12 +89,6 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			if (!sSplit[0].equals("inds"))
 				return;
 			
-			if (true){
-				Thread.sleep(500000);
-//				writeResponse(e);
-				return;
-			}
-			
 			logger.info("inds: " + sSplit[1]);
 			String[] dss = sSplit[1].split(",");
 
@@ -104,6 +98,12 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			if (totsize<0) {
 				buf.append("warning:at least one of the datasets does not exist, or has no root files.");
 				writeResponse(e);
+				return;
+			}
+
+			if (true){
+				Thread.sleep(500000);
+//				writeResponse(e);
 				return;
 			}
 			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
@@ -270,7 +270,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
 		logger.debug("eXcEpTiOn caught. client broke connection.");
-//		e.getCause().printStackTrace();
+		e.getCause().printStackTrace();
 		e.getChannel().close();
 	}
 }
