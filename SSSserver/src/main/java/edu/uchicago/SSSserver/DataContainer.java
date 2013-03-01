@@ -103,6 +103,7 @@ public class DataContainer {
 		ArrayList<tree> res = ds.getTrees();
 		if (res.size() == 0) {
 			try {
+				logger.info("trees not returned. waiting 5 seconds before retry.");
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
