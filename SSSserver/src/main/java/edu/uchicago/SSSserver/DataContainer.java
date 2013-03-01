@@ -40,7 +40,7 @@ public class DataContainer {
 			}
 			res += dsa;
 		}
-		if (needswait=false)
+		if (needswait==false)
 			return res;
 		else {
 			try {
