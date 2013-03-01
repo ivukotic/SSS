@@ -33,7 +33,7 @@ public class DataContainer {
 				logger.info("ds not known or not in fax.");
 				return -1L;
 			}
-			else if (dsa==0)
+			if (dsa==0)
 				logger.info("size of this ds not yet known.");
 			res += dsa;
 		}
