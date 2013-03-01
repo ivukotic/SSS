@@ -28,13 +28,17 @@ public class DataContainer {
 	public long getInputSize() {
 		long res = 0;
 		for (Dataset ds : dSets) {
-			if (ds.getSize()==-1) return -1L;
+			if (ds.getSize()==-1) {
+				logger.info("size of this ds not yet known.");
+				return -1L;
+			}
 			res += ds.getSize();
 		}
 		if (res > 0)
 			return res;
 		else {
 			try {
+				logger.info("sleeping for 1 second before retry.");
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();

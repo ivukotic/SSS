@@ -53,7 +53,7 @@ public class Task {
 			BufferedWriter out = new BufferedWriter(fstream);
 			for (String s : inputFiles) {
 				if (redi != null)
-					s=s.replaceFirst("root://glrd.usatlas.org/", redi);
+					s = s.replaceFirst("root://glrd.usatlas.org/", redi);
 				out.write(s + "\n");
 			}
 			out.close();
@@ -89,6 +89,7 @@ public class Task {
 			BufferedWriter out = new BufferedWriter(fstream);
 			String res = "#!/bin/zsh\n";
 			res += "export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase\n";
+			// res += "export ALRB_useGridSW=gLite\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh\n";
 			res += "source $AtlasSetup/scripts/asetup.sh 17.6.0,noTest\n";
 			res += "export X509_USER_PROXY=x509up_u20074\n";
@@ -96,7 +97,7 @@ public class Task {
 			res += "export DQ2_LOCAL_SITE_ID=MWT2_UC_USERDISK\n";
 			res += "python filter-and-merge-d3pd.py ";
 			res += " --in=" + fn + "inputFileList";
-			res += " --outDS="+dataset;
+			res += " --outDS=" + dataset;
 			res += " --out=" + outFile;
 			res += " --tree=" + tree;
 			res += " --var=" + fn + "branchesList";
