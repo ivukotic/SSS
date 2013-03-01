@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class Dataset {
 
 	final Logger logger = LoggerFactory.getLogger(Dataset.class);
@@ -25,7 +26,10 @@ public class Dataset {
 		alRootFiles = new ArrayList<RootFile>();
 		summedTrees = new ArrayList<tree>();
 		processed = 0;
-		queryDQ2();
+//		queryDQ2();
+
+		DQ2runner dqr = new DQ2runner();
+		dqr.start();
 	}
 
 	private void setPath(String pat) {
@@ -78,7 +82,62 @@ public class Dataset {
 
 		}
 	}
+	
+	//threaded queryDQ2
+	private class DQ2runner extends Thread {
+		public void run() {
+			try {
+				Runtime rt = Runtime.getRuntime();
+				String comm = "dq2-ls -f " + name;
+				logger.info("executing >" + comm + "<");
+				Process pr = rt.exec(comm);
 
+				BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+
+				String line = null;
+				while ((line = input.readLine()) != null) {
+					if (line.indexOf(".root") > 0) {
+						logger.debug(line);
+						String[] r = line.split("\t");
+						if (r.length == 5)
+							alRootFiles.add(new RootFile(r[1], r[2], Long.parseLong(r[4])));
+					}
+				}
+
+				int exitVal = pr.waitFor();
+				if (exitVal != 0) {
+					logger.error("Problem with 'dq2-ls -f'. Exited with code " + exitVal);
+					return;
+				}
+				if (alRootFiles.isEmpty()){
+					logger.error("no root files recognized in the output of dq2-ls -f  ");
+					return;
+				}
+				// get gLFN path
+				comm = "dq2-list-files -p " + name;
+				logger.info("executing >" + comm + "<");
+				Process pr1 = rt.exec(comm);
+				BufferedReader input1 = new BufferedReader(new InputStreamReader(pr1.getInputStream()));
+				line = null;
+				if ((line = input1.readLine()) != null) {
+					logger.debug(line);
+					line = line.substring(0, line.lastIndexOf("/"));
+					logger.info("DS gLFN: " + line);
+				}
+
+				exitVal = pr1.waitFor();
+				if (exitVal != 0) {
+					logger.error("PROBLEM Exited with code " + exitVal);
+				} else {
+					setPath(line);
+				}
+				logger.debug("dq2-list-files finished OK.");
+			} catch (Exception e) {
+				logger.error("unrecognized exception: " + e.getMessage());
+			}
+		}
+	}
+	
 	// runs dq2-ls -f to get the files of the dataset. (also file sizes.)
 	// than runs dq2-list-files -p in order to get gLFN path.
 	private void queryDQ2() {
