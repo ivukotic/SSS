@@ -101,13 +101,15 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 				return;
 			}
 
+			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+			String treeDetails=DC.getTreeDetails();
+			
+
 			if (true){
 				Thread.sleep(500000);
 //				writeResponse(e);
 				return;
 			}
-			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			String treeDetails=DC.getTreeDetails();
 			
 			buf.append("size:" + String.valueOf(totsize) + "\n");
 			buf.append(treeDetails);
