@@ -101,6 +101,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 				return;
 			}
 			buf.append("size:" + String.valueOf(totsize) + "\n");
+			if (true)return;
 			buf.append(DC.getTreeDetails());
 
 			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");

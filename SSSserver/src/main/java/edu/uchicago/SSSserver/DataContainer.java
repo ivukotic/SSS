@@ -28,11 +28,14 @@ public class DataContainer {
 	public long getInputSize() {
 		long res = 0;
 		for (Dataset ds : dSets) {
-			if (ds.getSize()==-1) {
-				logger.info("size of this ds not yet known.");
+			long dsa=ds.getSize();
+			if (dsa==-1) {
+				logger.info("ds not known or not in fax.");
 				return -1L;
 			}
-			res += ds.getSize();
+			else if (dsa==0)
+				logger.info("size of this ds not yet known.");
+			res += dsa;
 		}
 		if (res > 0)
 			return res;
