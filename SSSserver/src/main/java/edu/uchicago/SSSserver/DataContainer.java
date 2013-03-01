@@ -27,17 +27,20 @@ public class DataContainer {
 	
 	public long getInputSize() {
 		long res = 0;
+		boolean needswait=false;
 		for (Dataset ds : dSets) {
 			long dsa=ds.getSize();
 			if (dsa==-1) {
 				logger.info("ds not known or not in fax.");
 				return -1L;
 			}
-			if (dsa==0)
+			if (dsa==0){
 				logger.info("size of this ds not yet known.");
+				needswait=true;
+			}
 			res += dsa;
 		}
-		if (res > 0)
+		if (needswait=false)
 			return res;
 		else {
 			try {
