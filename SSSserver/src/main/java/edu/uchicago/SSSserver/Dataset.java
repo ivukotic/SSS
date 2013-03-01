@@ -140,7 +140,6 @@ public class Dataset {
 					setPath(line);
 				}
 				logger.debug("dq2-list-files finished OK.");
-				updateTrees();
 				done = true;
 			} catch (Exception e) {
 				logger.error("unrecognized exception: " + e.getMessage());
