@@ -53,11 +53,15 @@ public class Dataset {
 			logger.error("problem while waiting on getSize()");
 			e.printStackTrace();
 		}
+
+		logger.info("in getSize - joined");
+		
 		if (alRootFiles.isEmpty()) return -1L;
 		size = 0;
 		for (RootFile rf : alRootFiles) {
 			size += rf.size;
 		}
+		logger.info("in getSize - returning");
 		return size;
 	}
 
@@ -148,7 +152,7 @@ public class Dataset {
 				} else {
 					setPath(line);
 				}
-				logger.debug("dq2-list-files finished OK.");
+				logger.info("dq2-list-files finished OK.");
 //				done = true;
 			} catch (Exception e) {
 				logger.error("unrecognized exception: " + e.getMessage());
