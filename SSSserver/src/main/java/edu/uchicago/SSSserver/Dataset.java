@@ -146,12 +146,12 @@ public class Dataset {
 					logger.info("DS gLFN: " + line);
 				}
 
-				exitVal = pr1.waitFor();
-				if (exitVal != 0) {
-					logger.error("PROBLEM Exited with code " + exitVal);
-				} else {
+//				exitVal = pr1.waitFor();
+//				if (exitVal != 0) {
+//					logger.error("PROBLEM Exited with code " + exitVal);
+//				} else {
 					setPath(line);
-				}
+//				}
 				logger.info("dq2-list-files finished OK.");
 //				done = true;
 			} catch (Exception e) {
