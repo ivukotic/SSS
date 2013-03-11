@@ -40,6 +40,7 @@ public class Response extends Thread {
 	}
 
 	public StringBuilder getStringBuffer() {
+		buf.setLength(0);
 		if (totsize < 0) {
 			buf.append("warning:at least one of the datasets does not exist, or has no root files.");
 			return buf;
