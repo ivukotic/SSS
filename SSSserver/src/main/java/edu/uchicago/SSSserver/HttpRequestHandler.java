@@ -83,169 +83,173 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			if (pars.length == 1) {
 				// check if this is md5 and if it is, find the current state of
 				// that datacontainer and return it.
-				logger.info("got md5. Sending results back.");
-				writeResponse(e,pars[0]);
+				logger.info("got md5:"+pars[0]);
+				sendBackResults(e,pars[0]);
 				return;
 			}
 
 			// this is creating a new response.
 			String requestMD5 = MD5(mes);
 			Response resp=DSB.getResponse(requestMD5);
-			if (resp.stage.get()==0){
+			if (resp==null){
+				resp=DSB.createResponse(requestMD5);
 				resp.parseParameters(pars);
-			}{
-				logger.info("already had that md5. not parsing again.");
+			}else{
+				logger.info("already had that md5. not parsing again. returning the result.");
 			}
 			
 			// sending only md5 back
-			writeResponse(e,resp); 
+			sendBackMD5(e,resp); 
 			// start the thread.
 			
 			if (true) return;
-			
-			logger.info("datasets xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			String[] sSplit = pars[0].split("=");
-
-			if (!sSplit[0].equals("inds"))
-				return;
-
-			logger.info("inds: " + sSplit[1]);
-			String[] dss = sSplit[1].split(",");
-			
-			DataContainer DC = DSB.getContainer(dss);
-			
-			logger.info("DataContainer in place.Getting its size.");
-
-			long totsize = DC.getInputSize();
-			if (totsize < 0) {
-				resp.append("warning:at least one of the datasets does not exist, or has no root files.");
-				writeResponse(e,resp);
-				return;
-			}
-
-			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-
-			resp.append("size:" + String.valueOf(totsize) + "\n");
-			resp.append(DC.getTreeDetails());
-
-			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-
-			sSplit = pars[1].split("=");
-			if (!sSplit[0].equals("mainTree"))
-				return;
-			String mainTree = null;
-			if (sSplit.length == 2) {
-				mainTree = sSplit[1];
-				logger.info("mainTree: " + mainTree);
-				resp.append(mainTree + "\n");
-			} else {
-				resp.append("noTree\n");
-			}
-
-			sSplit = pars[2].split("=");
-			if (!sSplit[0].equals("treesToCopy"))
-				return;
-			HashSet<String> treesToCopy = new HashSet<String>();
-			if (sSplit.length == 1) {
-				logger.info("No trees to copy selected.");
-				resp.append("NoTree\n");
-			} else {
-				String[] ttC = sSplit[1].split(",");
-				for (String c : ttC)
-					treesToCopy.add(c);
-				logger.info("treesToCopy: " + sSplit[1]);
-				resp.append(sSplit[1] + "\n");
-			}
-
-			logger.info("branches xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			sSplit = pars[3].split("=");
-			if (!sSplit[0].equals("branchesToKeep"))
-				return;
-			HashSet<String> branchesToKeep = new HashSet<String>();
-			if (sSplit.length == 1) {
-				logger.info("No branches to keep selected.");
-			} else {
-				String[] byComma = sSplit[1].split(",");
-				for (String s : byComma) {
-					String[] byNewLine = s.split("\n");
-					for (String n : byNewLine)
-						branchesToKeep.add(n);
-				}
-				logger.info("branches to keep: " + sSplit[1]);
-			}
-
-			logger.info("cut code xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			if (!pars[4].startsWith("cutCode="))
-				return;
-			String cutCode = pars[4].substring(8);
-			logger.info("cut code: " + cutCode);
-
-			resp.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
-			// ==================================================
-
-			sSplit = pars[5].split("=");
-			if (!sSplit[0].equals("sReq"))
-				return;
-
-			if (sSplit[1].equals("1")) {
-				logger.info("submit request xxxxxxxxxxxxxxxxxxxxxxxxxx");
-
-				// create input files, submit script
-				// DC.createCondorInputFiles(mainTree, treesToCopy,
-				// branchesToKeep, cutCode);
-
-				// execute condor_submit
-				String outDS = null;
-				sSplit = pars[6].split("=");
-				if (!sSplit[0].equals("outDS"))
-					return;
-
-				if (sSplit.length == 1) {
-					logger.error("No outDS !");
-				} else {
-					outDS = sSplit[1];
-					logger.info("outDS: " + outDS);
-				}
-
-				String deliverTo = null;
-				sSplit = pars[7].split("=");
-				if (!sSplit[0].equals("deliverTo"))
-					return;
-
-				if (sSplit.length == 1) {
-					logger.info("No delivery");
-				} else {
-					deliverTo = sSplit[1];
-					logger.info("deliverTo: " + deliverTo);
-				}
-
-				DC.insertJob(outDS, mainTree, treesToCopy, branchesToKeep, cutCode, deliverTo);
-				logger.debug("submitted");
-
-				resp.append("\nYour job has been submitted.");
-			} else
-				resp.append("\nOK");
-			// ==================================================
-
-			if (request.isChunked()) {
-				readingChunks = true;
-			} else {
-				writeResponse(e,resp);
-
-				logger.info("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			}
+//			
+//			logger.info("datasets xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+//			String[] sSplit = pars[0].split("=");
+//
+//			if (!sSplit[0].equals("inds"))
+//				return;
+//
+//			logger.info("inds: " + sSplit[1]);
+//			String[] dss = sSplit[1].split(",");
+//			
+//			DataContainer DC = DSB.getContainer(dss);
+//			
+//			logger.info("DataContainer in place.Getting its size.");
+//
+//			long totsize = DC.getInputSize();
+//			if (totsize < 0) {
+//				resp.append("warning:at least one of the datasets does not exist, or has no root files.");
+//				writeResponse(e,resp);
+//				return;
+//			}
+//
+//			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+//
+//			resp.append("size:" + String.valueOf(totsize) + "\n");
+//			resp.append(DC.getTreeDetails());
+//
+//			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+//
+//			sSplit = pars[1].split("=");
+//			if (!sSplit[0].equals("mainTree"))
+//				return;
+//			String mainTree = null;
+//			if (sSplit.length == 2) {
+//				mainTree = sSplit[1];
+//				logger.info("mainTree: " + mainTree);
+//				resp.append(mainTree + "\n");
+//			} else {
+//				resp.append("noTree\n");
+//			}
+//
+//			sSplit = pars[2].split("=");
+//			if (!sSplit[0].equals("treesToCopy"))
+//				return;
+//			HashSet<String> treesToCopy = new HashSet<String>();
+//			if (sSplit.length == 1) {
+//				logger.info("No trees to copy selected.");
+//				resp.append("NoTree\n");
+//			} else {
+//				String[] ttC = sSplit[1].split(",");
+//				for (String c : ttC)
+//					treesToCopy.add(c);
+//				logger.info("treesToCopy: " + sSplit[1]);
+//				resp.append(sSplit[1] + "\n");
+//			}
+//
+//			logger.info("branches xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+//			sSplit = pars[3].split("=");
+//			if (!sSplit[0].equals("branchesToKeep"))
+//				return;
+//			HashSet<String> branchesToKeep = new HashSet<String>();
+//			if (sSplit.length == 1) {
+//				logger.info("No branches to keep selected.");
+//			} else {
+//				String[] byComma = sSplit[1].split(",");
+//				for (String s : byComma) {
+//					String[] byNewLine = s.split("\n");
+//					for (String n : byNewLine)
+//						branchesToKeep.add(n);
+//				}
+//				logger.info("branches to keep: " + sSplit[1]);
+//			}
+//
+//			logger.info("cut code xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+//			if (!pars[4].startsWith("cutCode="))
+//				return;
+//			String cutCode = pars[4].substring(8);
+//			logger.info("cut code: " + cutCode);
+//
+//			resp.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
+//			// ==================================================
+//
+//			sSplit = pars[5].split("=");
+//			if (!sSplit[0].equals("sReq"))
+//				return;
+//
+//			if (sSplit[1].equals("1")) {
+//				logger.info("submit request xxxxxxxxxxxxxxxxxxxxxxxxxx");
+//
+//				// create input files, submit script
+//				// DC.createCondorInputFiles(mainTree, treesToCopy,
+//				// branchesToKeep, cutCode);
+//
+//				// execute condor_submit
+//				String outDS = null;
+//				sSplit = pars[6].split("=");
+//				if (!sSplit[0].equals("outDS"))
+//					return;
+//
+//				if (sSplit.length == 1) {
+//					logger.error("No outDS !");
+//				} else {
+//					outDS = sSplit[1];
+//					logger.info("outDS: " + outDS);
+//				}
+//
+//				String deliverTo = null;
+//				sSplit = pars[7].split("=");
+//				if (!sSplit[0].equals("deliverTo"))
+//					return;
+//
+//				if (sSplit.length == 1) {
+//					logger.info("No delivery");
+//				} else {
+//					deliverTo = sSplit[1];
+//					logger.info("deliverTo: " + deliverTo);
+//				}
+//
+//				DC.insertJob(outDS, mainTree, treesToCopy, branchesToKeep, cutCode, deliverTo);
+//				logger.debug("submitted");
+//
+//				resp.append("\nYour job has been submitted.");
+//			} else
+//				resp.append("\nOK");
+//			// ==================================================
+//
+//			if (request.isChunked()) {
+//				readingChunks = true;
+//			} else {
+//				writeResponse(e,resp);
+//
+//				logger.info("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+//			}
 		}
 	}
 
 
 
-	private void writeResponse(MessageEvent e,Response r) {
+	private void sendBackMD5(MessageEvent e,Response r) {
 		// Decide whether to close the connection or not.
 		boolean keepAlive = isKeepAlive(request);
 
 		// Build the response object.
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-		logger.info("returns:\n" + r.getStringBuffer().toString());
+
+		StringBuilder buf = new StringBuilder();
+		buf.append("md5:"+r.md5);
+		logger.info("returns:\n" + r.md5);
 
 		response.setContent(ChannelBuffers.copiedBuffer(r.getStringBuffer(), CharsetUtil.UTF_8));
 		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
@@ -281,18 +285,19 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 	}
 	
-	// this one just sends md5 back. used after initial input parsing.
-	private void writeResponse(MessageEvent e,String md5) {
+	// this one sends results back. 
+	private void sendBackResults(MessageEvent e, String md5) {
 		// Decide whether to close the connection or not.
 		boolean keepAlive = isKeepAlive(request);
 
 		// Build the response object.
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-		StringBuilder buf = new StringBuilder();
-		buf.append("md5:"+md5);
-		logger.info("returns:\n" + md5);
+		Response result=DSB.getResponse(md5);
+		if (result==null){
+			return;
+		}
 
-		response.setContent(ChannelBuffers.copiedBuffer(buf, CharsetUtil.UTF_8));
+		response.setContent(ChannelBuffers.copiedBuffer(result.getStringBuffer(), CharsetUtil.UTF_8));
 		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
 
 		if (keepAlive) {

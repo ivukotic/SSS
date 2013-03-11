@@ -35,15 +35,23 @@ public class DataSetsBuffer {
 		return ds;
 	}
 
-	public Response getResponse(String md5){
-		for (Response r: responses){
-			if (md5.equals(r.md5)) return r;
-		}
-		logger.info("request with md5: "+md5+" not found. Created new response.");
+	public Response createResponse(String md5){
+		logger.info("Created new response:"+md5);
 		Response r=new Response();
 		r.md5=md5;
 		responses.add(r);
 		return r;
+	}
+	
+	public Response getResponse(String md5){
+		for (Response r: responses){
+			if (md5.equals(r.md5)) {
+				logger.info("request: "+md5+" found.");
+				return r;
+				}
+		}
+		logger.info("request with md5: "+md5+" not found.");
+		return null;
 	}
 	
 }
