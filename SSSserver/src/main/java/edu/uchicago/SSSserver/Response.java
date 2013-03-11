@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Response extends Thread {
-	
+
 	final static Logger logger = LoggerFactory.getLogger(Response.class);
 	public String md5;
 	private StringBuilder buf = new StringBuilder();
-	// stage starts with 0 
+	// stage starts with 0
 	// 1 - parameters set
 	// 2 - started dq2-ls
 	// 3 - finished dq2-ls
@@ -19,8 +19,8 @@ public class Response extends Thread {
 	// 5 - finished inspecting
 	// ...
 	public AtomicInteger stage = new AtomicInteger();
-	public AtomicInteger openFiles=new AtomicInteger();
-	
+	public AtomicInteger openFiles = new AtomicInteger();
+
 	public String[] dss;
 	private String mainTree;
 	HashSet<String> treesToCopy = new HashSet<String>();
@@ -29,19 +29,19 @@ public class Response extends Thread {
 	private String outDS;
 	private String deliverTo;
 	private DataContainer DC;
-	
-	Response(){
+
+	Response() {
 		buf.setLength(0);
 	}
-	
-	public void append(String s){
+
+	public void append(String s) {
 		buf.append(s);
 	}
-	
-	public StringBuilder getStringBuffer(){
+
+	public StringBuilder getStringBuffer() {
 		return buf;
 	}
-	
+
 	public void run() {
 		try {
 			buf.setLength(0);
@@ -53,45 +53,49 @@ public class Response extends Thread {
 			}
 			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			buf.append("size:" + String.valueOf(totsize) + "\n");
-			
+
 			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			buf.append(mainTree + "\n");
-			String joinedTrees="";
-			for (String c : treesToCopy)
-				joinedTrees+=","+c;
-			joinedTrees=joinedTrees.substring(1);
+			String joinedTrees = "";
+			if (treesToCopy.size() > 0) {
+				for (String c : treesToCopy)
+					joinedTrees += "," + c;
+				joinedTrees = joinedTrees.substring(1);
+			}
 			buf.append(joinedTrees + "\n");
-			
+
 			buf.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
-			
+
 			buf.append("\nOK");
 		} catch (Exception e) {
 			logger.error("unrecognized exception: " + e.getMessage());
 		}
 	}
 
-	public void parseParameters(String[] pars){
-		
+	public void parseParameters(String[] pars) {
+
 		logger.info("datasets xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 		String[] sSplit = pars[0].split("=");
-		if (!sSplit[0].equals("inds")) return;
-		
+		if (!sSplit[0].equals("inds"))
+			return;
+
 		logger.info("inds: " + sSplit[1]);
-		dss=sSplit[1].split(",");
-		
+		dss = sSplit[1].split(",");
 
 		logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 		sSplit = pars[1].split("=");
-		if (!sSplit[0].equals("mainTree")) return;
-		
-		mainTree = "noTree";
+		if (!sSplit[0].equals("mainTree"))
+			return;
+
+		mainTree = "undefined";
 		if (sSplit.length == 2) {
 			mainTree = sSplit[1];
 			logger.info("mainTree: " + mainTree);
-		} 
-		
+		}
+
 		sSplit = pars[2].split("=");
-		if (!sSplit[0].equals("treesToCopy")) return;
+		if (!sSplit[0].equals("treesToCopy"))
+			return;
 		HashSet<String> treesToCopy = new HashSet<String>();
 		if (sSplit.length == 1) {
 			logger.info("No trees to copy selected.");
@@ -104,7 +108,8 @@ public class Response extends Thread {
 
 		logger.info("branches xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 		sSplit = pars[3].split("=");
-		if (!sSplit[0].equals("branchesToKeep")) return;
+		if (!sSplit[0].equals("branchesToKeep"))
+			return;
 		if (sSplit.length == 1) {
 			logger.info("No branches to keep selected.");
 		} else {
@@ -116,21 +121,23 @@ public class Response extends Thread {
 			}
 			logger.info("branches to keep: " + sSplit[1]);
 		}
-		
+
 		logger.info("cut code xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-		if (!pars[4].startsWith("cutCode=")) return;
+		if (!pars[4].startsWith("cutCode="))
+			return;
 		cutCode = pars[4].substring(8);
 		logger.info("cut code: " + cutCode);
-		
-		
+
 		sSplit = pars[5].split("=");
-		if (!sSplit[0].equals("sReq")) return;
+		if (!sSplit[0].equals("sReq"))
+			return;
 
 		if (sSplit[1].equals("1")) {
 			logger.info("submit request xxxxxxxxxxxxxxxxxxxxxxxxxx");
 
 			sSplit = pars[6].split("=");
-			if (!sSplit[0].equals("outDS")) return;
+			if (!sSplit[0].equals("outDS"))
+				return;
 
 			if (sSplit.length == 1) {
 				logger.error("No outDS !");
@@ -140,7 +147,8 @@ public class Response extends Thread {
 			}
 
 			sSplit = pars[7].split("=");
-			if (!sSplit[0].equals("deliverTo")) return;
+			if (!sSplit[0].equals("deliverTo"))
+				return;
 
 			if (sSplit.length == 1) {
 				logger.info("No delivery");
@@ -151,13 +159,12 @@ public class Response extends Thread {
 		}
 		// ==================================================
 		stage.set(1);
-		
-		
+
 	}
 
-	public void setDC(DataContainer dc){
-		DC=dc;
+	public void setDC(DataContainer dc) {
+		DC = dc;
 		logger.info("DataContainer in place.");
 	}
-	
+
 }
