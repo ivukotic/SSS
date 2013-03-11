@@ -19,7 +19,7 @@ public class Dataset {
 	public ArrayList<RootFile> alRootFiles;
 	ArrayList<tree> summedTrees;
 	public int processed;
-
+	private DQ2runner dqr;
 	boolean started;
 	boolean done;
 	
@@ -31,7 +31,7 @@ public class Dataset {
 		processed = 0;
 //		queryDQ2();
 
-		DQ2runner dqr = new DQ2runner();
+		dqr = new DQ2runner();
 		dqr.start();
 		started = true;
 		done = false;
@@ -45,7 +45,13 @@ public class Dataset {
 	}
 
 	public Long getSize() {
-		if (done==false) return 0L;
+//		if (done==false) return 0L;
+		try {
+			dqr.join();
+		} catch (InterruptedException e) {
+			logger.error("problem while waiting on getSize()");
+			e.printStackTrace();
+		}
 		if (alRootFiles.isEmpty()) return -1L;
 		size = 0;
 		for (RootFile rf : alRootFiles) {
@@ -90,6 +96,8 @@ public class Dataset {
 	}
 	
 	//threaded queryDQ2
+	// runs dq2-ls -f to get the files of the dataset. (also file sizes.)
+	// than runs dq2-list-files -p in order to get gLFN path.
 	private class DQ2runner extends Thread {
 		public void run() {
 			try {

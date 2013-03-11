@@ -101,6 +101,8 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			String[] dss = sSplit[1].split(",");
 
 			DataContainer DC = DSB.getContainer(dss);
+			
+			logger.info("DataContainer in place.Getting its size.");
 
 			long totsize = DC.getInputSize();
 			if (totsize < 0) {
