@@ -94,10 +94,13 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			if (resp==null){
 				resp=DSB.createResponse(requestMD5);
 				resp.parseParameters(pars);
+				DataContainer DC = DSB.getContainer(resp.dss);
+				resp.setDC(DC);
 			}else{
 				logger.info("already had that md5. not parsing again. returning the result.");
 			}
 			
+			resp.start();
 			// sending only md5 back
 			sendBackMD5(e,resp); 
 			// start the thread.

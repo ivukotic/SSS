@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Response {
+public class Response extends Thread {
 	
 	final static Logger logger = LoggerFactory.getLogger(Response.class);
 	public String md5;
@@ -21,13 +21,14 @@ public class Response {
 	public AtomicInteger stage = new AtomicInteger();
 	public AtomicInteger openFiles=new AtomicInteger();
 	
-	private String[] dss;
+	public String[] dss;
 	private String mainTree;
 	HashSet<String> treesToCopy = new HashSet<String>();
 	HashSet<String> branchesToKeep = new HashSet<String>();
 	private String cutCode;
 	private String outDS;
 	private String deliverTo;
+	private DataContainer DC;
 	
 	Response(){
 		buf.setLength(0);
@@ -41,7 +42,21 @@ public class Response {
 		return buf;
 	}
 	
-
+	public void run() {
+		try {
+			buf.setLength(0);
+			logger.info("Getting DC size.");
+			long totsize = DC.getInputSize();
+			if (totsize < 0) {
+				buf.append("warning:at least one of the datasets does not exist, or has no root files.");
+				return;
+			}
+			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+			buf.append("size:" + String.valueOf(totsize) + "\n");
+		} catch (Exception e) {
+			logger.error("unrecognized exception: " + e.getMessage());
+		}
+	}
 
 	public void parseParameters(String[] pars){
 		
@@ -128,4 +143,9 @@ public class Response {
 		
 	}
 
+	public void setDC(DataContainer dc){
+		DC=dc;
+		logger.info("DataContainer in place.");
+	}
+	
 }
