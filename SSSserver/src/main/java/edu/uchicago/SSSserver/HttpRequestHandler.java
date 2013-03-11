@@ -249,9 +249,9 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 		StringBuilder buf = new StringBuilder();
 		buf.append("md5:"+r.md5);
-		logger.info("returns:\n" + r.md5);
+		logger.info("returns md5: " + r.md5);
 
-		response.setContent(ChannelBuffers.copiedBuffer(r.getStringBuffer(), CharsetUtil.UTF_8));
+		response.setContent(ChannelBuffers.copiedBuffer(buf, CharsetUtil.UTF_8));
 		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
 
 		if (keepAlive) {
