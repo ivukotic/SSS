@@ -53,6 +53,18 @@ public class Response extends Thread {
 			}
 			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			buf.append("size:" + String.valueOf(totsize) + "\n");
+			
+			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+			buf.append(mainTree + "\n");
+			String joinedTrees="";
+			for (String c : treesToCopy)
+				joinedTrees+=","+c;
+			joinedTrees=joinedTrees.substring(1);
+			buf.append(joinedTrees + "\n");
+			
+			buf.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
+			
+			buf.append("\nOK");
 		} catch (Exception e) {
 			logger.error("unrecognized exception: " + e.getMessage());
 		}
@@ -72,7 +84,7 @@ public class Response extends Thread {
 		sSplit = pars[1].split("=");
 		if (!sSplit[0].equals("mainTree")) return;
 		
-		mainTree = null;
+		mainTree = "noTree";
 		if (sSplit.length == 2) {
 			mainTree = sSplit[1];
 			logger.info("mainTree: " + mainTree);
