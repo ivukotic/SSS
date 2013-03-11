@@ -19,7 +19,8 @@ export dbusername=...
 export dbpass=...
 
 export SSS_UNIVERSE=vanilla
-export SSS_REQUIREMENTS='(UidDomain == "osg-gk.mwt2.org") &&  ( regexp("^uc3.*", TARGET.Machine,"IM") == True )'
+export SSS_REQUIREMENTS=(HAS_CVMFS =?= True)
+export SSS_EXTRA_CONDOR_SETTINGS='+AccountingGroup="group_uct3.ivukotic"'
 
 export STORAGEPREFIX=root://fax.mwt2.org/
 

@@ -10,6 +10,7 @@ public class DataSetsBuffer {
 	final Logger logger = LoggerFactory.getLogger(DataSetsBuffer.class);
 
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
+    private ArrayList<Response> responses = new ArrayList<Response>();
     
 	public DataContainer getContainer(String[] sDSs){
 		logger.info("creating new DataContainer.");
@@ -34,5 +35,13 @@ public class DataSetsBuffer {
 		return ds;
 	}
 
-
+	public StringBuilder getResult(String md5){
+		for (Response r: responses){
+			if (md5.equals(r.md5)) return r.buf;
+		}
+		StringBuilder buf = new StringBuilder();
+		buf.append("request with md5: "+md5+" not found");
+		logger.error("request with md5: "+md5+" not found");
+		return buf;
+	}
 }

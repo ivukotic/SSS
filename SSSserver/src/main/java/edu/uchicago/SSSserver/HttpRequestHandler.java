@@ -46,7 +46,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		logger.info("MessageReceived.");
-//		logger.info("Message: " + e.toString());
+		// logger.info("Message: " + e.toString());
 
 		dSets.clear();
 
@@ -76,10 +76,18 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			}
 			logger.info("------------------------------------------------");
 
-			if (pars.length < 8) {
+			if (pars.length == 1) {
+				// check if this is md5 and if it is, find the current state of
+				// that datacontainer and return it.
+				logger.info("got md5. Sending results back.");
+				writeResponse(e,DSB.getResult(pars[0]));
+				return;
+			}
+			if (pars.length > 1 && pars.length < 8) {
 				logger.error("Not enough parameters.");
 				return;
 			}
+			String requestMD5 = MD5(mes);
 
 			buf.setLength(0);
 
@@ -88,24 +96,24 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 			if (!sSplit[0].equals("inds"))
 				return;
-			
+
 			logger.info("inds: " + sSplit[1]);
 			String[] dss = sSplit[1].split(",");
 
 			DataContainer DC = DSB.getContainer(dss);
 
 			long totsize = DC.getInputSize();
-			if (totsize<0) {
+			if (totsize < 0) {
 				buf.append("warning:at least one of the datasets does not exist, or has no root files.");
 				writeResponse(e);
 				return;
 			}
 
 			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			
+
 			buf.append("size:" + String.valueOf(totsize) + "\n");
 			buf.append(DC.getTreeDetails());
-			
+
 			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
 			sSplit = pars[1].split("=");
@@ -157,22 +165,23 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 				return;
 			String cutCode = pars[4].substring(8);
 			logger.info("cut code: " + cutCode);
-			
+
 			buf.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
 			// ==================================================
 
 			sSplit = pars[5].split("=");
 			if (!sSplit[0].equals("sReq"))
 				return;
-			
+
 			if (sSplit[1].equals("1")) {
 				logger.info("submit request xxxxxxxxxxxxxxxxxxxxxxxxxx");
 
 				// create input files, submit script
-//				DC.createCondorInputFiles(mainTree, treesToCopy, branchesToKeep, cutCode);
-				
+				// DC.createCondorInputFiles(mainTree, treesToCopy,
+				// branchesToKeep, cutCode);
+
 				// execute condor_submit
-				String outDS=null;
+				String outDS = null;
 				sSplit = pars[6].split("=");
 				if (!sSplit[0].equals("outDS"))
 					return;
@@ -180,11 +189,11 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 				if (sSplit.length == 1) {
 					logger.error("No outDS !");
 				} else {
-					outDS=sSplit[1];
+					outDS = sSplit[1];
 					logger.info("outDS: " + outDS);
 				}
 
-				String deliverTo=null;
+				String deliverTo = null;
 				sSplit = pars[7].split("=");
 				if (!sSplit[0].equals("deliverTo"))
 					return;
@@ -192,16 +201,16 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 				if (sSplit.length == 1) {
 					logger.info("No delivery");
 				} else {
-					deliverTo=sSplit[1];
+					deliverTo = sSplit[1];
 					logger.info("deliverTo: " + deliverTo);
 				}
 
 				DC.insertJob(outDS, mainTree, treesToCopy, branchesToKeep, cutCode, deliverTo);
 				logger.debug("submitted");
-				
+
 				buf.append("\nYour job has been submitted.");
-			}
-			else buf.append("\nOK");
+			} else
+				buf.append("\nOK");
 			// ==================================================
 
 			if (request.isChunked()) {
@@ -256,6 +265,50 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 	}
 
+
+	private void writeResponse(MessageEvent e,StringBuilder b) {
+		// Decide whether to close the connection or not.
+		boolean keepAlive = isKeepAlive(request);
+
+		// Build the response object.
+		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
+		logger.info("returns:\n" + b.toString());
+
+		response.setContent(ChannelBuffers.copiedBuffer(b, CharsetUtil.UTF_8));
+		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
+
+		if (keepAlive) {
+			// Add 'Content-Length' header only for a keep-alive connection.
+			response.setHeader(CONTENT_LENGTH, response.getContent().readableBytes());
+		}
+
+		// Encode the cookie.
+		String cookieString = request.getHeader(COOKIE);
+		if (cookieString != null) {
+			CookieDecoder cookieDecoder = new CookieDecoder();
+			Set<Cookie> cookies = cookieDecoder.decode(cookieString);
+			if (!cookies.isEmpty()) {
+				// Reset the cookies if necessary.
+				CookieEncoder cookieEncoder = new CookieEncoder(true);
+				for (Cookie cookie : cookies) {
+					cookieEncoder.addCookie(cookie);
+				}
+				response.addHeader(SET_COOKIE, cookieEncoder.encode());
+			}
+		}
+
+		// Write the response.
+		ChannelFuture future = e.getChannel().write(response);
+
+		// Close the non-keep-alive connection after the write operation is
+		// done.
+		if (!keepAlive) {
+			future.addListener(ChannelFutureListener.CLOSE);
+		}
+
+	}
+	
+	
 	private void send100Continue(MessageEvent e) {
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, CONTINUE);
 		e.getChannel().write(response);
@@ -267,4 +320,19 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 		e.getCause().printStackTrace();
 		e.getChannel().close();
 	}
+
+	private String MD5(String md5) {
+		try {
+			java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+			byte[] array = md.digest(md5.getBytes());
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < array.length; ++i) {
+				sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+			}
+			return sb.toString();
+		} catch (java.security.NoSuchAlgorithmException e) {
+		}
+		return null;
+	}
+
 }
