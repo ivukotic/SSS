@@ -35,13 +35,15 @@ public class DataSetsBuffer {
 		return ds;
 	}
 
-	public StringBuilder getResult(String md5){
+	public Response getResponse(String md5){
 		for (Response r: responses){
-			if (md5.equals(r.md5)) return r.buf;
+			if (md5.equals(r.md5)) return r;
 		}
-		StringBuilder buf = new StringBuilder();
-		buf.append("request with md5: "+md5+" not found");
-		logger.error("request with md5: "+md5+" not found");
-		return buf;
+		logger.info("request with md5: "+md5+" not found. Created new response.");
+		Response r=new Response();
+		r.md5=md5;
+		responses.add(r);
+		return r;
 	}
+	
 }

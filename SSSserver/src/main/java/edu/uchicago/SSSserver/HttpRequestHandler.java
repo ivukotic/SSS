@@ -33,7 +33,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	private HttpRequest request;
 	private boolean readingChunks;
 	/** Buffer that stores the response content */
-	private StringBuilder buf = new StringBuilder();
+//	private StringBuilder buf = new StringBuilder();
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
 
 	private DataSetsBuffer DSB;
@@ -75,22 +75,26 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 				logger.info(par);
 			}
 			logger.info("------------------------------------------------");
-
-			if (pars.length == 1) {
-				// check if this is md5 and if it is, find the current state of
-				// that datacontainer and return it.
-				logger.info("got md5. Sending results back.");
-				writeResponse(e,DSB.getResult(pars[0]));
-				return;
-			}
+			
 			if (pars.length > 1 && pars.length < 8) {
 				logger.error("Not enough parameters.");
 				return;
 			}
+			
+			if (pars.length == 1) {
+				// check if this is md5 and if it is, find the current state of
+				// that datacontainer and return it.
+				logger.info("got md5. Sending results back.");
+				writeResponse(e,DSB.getResponse(pars[0]));
+				return;
+			}
+
+			// this is creating a new response.
 			String requestMD5 = MD5(mes);
-
-			buf.setLength(0);
-
+			Response resp=DSB.getResponse(requestMD5);
+			
+			resp.parseParameters(pars);
+			
 			logger.info("datasets xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			String[] sSplit = pars[0].split("=");
 
@@ -99,22 +103,22 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 			logger.info("inds: " + sSplit[1]);
 			String[] dss = sSplit[1].split(",");
-
+			
 			DataContainer DC = DSB.getContainer(dss);
 			
 			logger.info("DataContainer in place.Getting its size.");
 
 			long totsize = DC.getInputSize();
 			if (totsize < 0) {
-				buf.append("warning:at least one of the datasets does not exist, or has no root files.");
-				writeResponse(e);
+				resp.append("warning:at least one of the datasets does not exist, or has no root files.");
+				writeResponse(e,resp);
 				return;
 			}
 
 			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
-			buf.append("size:" + String.valueOf(totsize) + "\n");
-			buf.append(DC.getTreeDetails());
+			resp.append("size:" + String.valueOf(totsize) + "\n");
+			resp.append(DC.getTreeDetails());
 
 			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
@@ -125,9 +129,9 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			if (sSplit.length == 2) {
 				mainTree = sSplit[1];
 				logger.info("mainTree: " + mainTree);
-				buf.append(mainTree + "\n");
+				resp.append(mainTree + "\n");
 			} else {
-				buf.append("noTree\n");
+				resp.append("noTree\n");
 			}
 
 			sSplit = pars[2].split("=");
@@ -136,13 +140,13 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			HashSet<String> treesToCopy = new HashSet<String>();
 			if (sSplit.length == 1) {
 				logger.info("No trees to copy selected.");
-				buf.append("NoTree\n");
+				resp.append("NoTree\n");
 			} else {
 				String[] ttC = sSplit[1].split(",");
 				for (String c : ttC)
 					treesToCopy.add(c);
 				logger.info("treesToCopy: " + sSplit[1]);
-				buf.append(sSplit[1] + "\n");
+				resp.append(sSplit[1] + "\n");
 			}
 
 			logger.info("branches xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
@@ -168,7 +172,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 			String cutCode = pars[4].substring(8);
 			logger.info("cut code: " + cutCode);
 
-			buf.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
+			resp.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
 			// ==================================================
 
 			sSplit = pars[5].split("=");
@@ -210,73 +214,32 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 				DC.insertJob(outDS, mainTree, treesToCopy, branchesToKeep, cutCode, deliverTo);
 				logger.debug("submitted");
 
-				buf.append("\nYour job has been submitted.");
+				resp.append("\nYour job has been submitted.");
 			} else
-				buf.append("\nOK");
+				resp.append("\nOK");
 			// ==================================================
 
 			if (request.isChunked()) {
 				readingChunks = true;
 			} else {
-				writeResponse(e);
+				writeResponse(e,resp);
 
 				logger.info("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			}
 		}
 	}
 
-	private void writeResponse(MessageEvent e) {
+
+
+	private void writeResponse(MessageEvent e,Response r) {
 		// Decide whether to close the connection or not.
 		boolean keepAlive = isKeepAlive(request);
 
 		// Build the response object.
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-		logger.info("returns:\n" + buf.toString());
+		logger.info("returns:\n" + r.getStringBuffer().toString());
 
-		response.setContent(ChannelBuffers.copiedBuffer(buf, CharsetUtil.UTF_8));
-		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
-
-		if (keepAlive) {
-			// Add 'Content-Length' header only for a keep-alive connection.
-			response.setHeader(CONTENT_LENGTH, response.getContent().readableBytes());
-		}
-
-		// Encode the cookie.
-		String cookieString = request.getHeader(COOKIE);
-		if (cookieString != null) {
-			CookieDecoder cookieDecoder = new CookieDecoder();
-			Set<Cookie> cookies = cookieDecoder.decode(cookieString);
-			if (!cookies.isEmpty()) {
-				// Reset the cookies if necessary.
-				CookieEncoder cookieEncoder = new CookieEncoder(true);
-				for (Cookie cookie : cookies) {
-					cookieEncoder.addCookie(cookie);
-				}
-				response.addHeader(SET_COOKIE, cookieEncoder.encode());
-			}
-		}
-
-		// Write the response.
-		ChannelFuture future = e.getChannel().write(response);
-
-		// Close the non-keep-alive connection after the write operation is
-		// done.
-		if (!keepAlive) {
-			future.addListener(ChannelFutureListener.CLOSE);
-		}
-
-	}
-
-
-	private void writeResponse(MessageEvent e,StringBuilder b) {
-		// Decide whether to close the connection or not.
-		boolean keepAlive = isKeepAlive(request);
-
-		// Build the response object.
-		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-		logger.info("returns:\n" + b.toString());
-
-		response.setContent(ChannelBuffers.copiedBuffer(b, CharsetUtil.UTF_8));
+		response.setContent(ChannelBuffers.copiedBuffer(r.getStringBuffer(), CharsetUtil.UTF_8));
 		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
 
 		if (keepAlive) {

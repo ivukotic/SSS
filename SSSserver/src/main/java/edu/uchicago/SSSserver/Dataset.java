@@ -20,8 +20,6 @@ public class Dataset {
 	ArrayList<tree> summedTrees;
 	public int processed;
 	private DQ2runner dqr;
-//	boolean started;
-//	boolean done;
 	
 	// creation of a dataset will just populate path, RootFile list
 	Dataset(String na) {
@@ -33,8 +31,6 @@ public class Dataset {
 
 		dqr = new DQ2runner();
 		dqr.start();
-//		started = true;
-//		done = false;
 	}
 
 	private void setPath(String pat) {
@@ -46,7 +42,6 @@ public class Dataset {
 
 	public Long getSize() {
 		logger.info("in getSize");
-//		if (done==false) return 0L;
 		try {
 			dqr.join();
 		} catch (InterruptedException e) {
@@ -54,14 +49,14 @@ public class Dataset {
 			e.printStackTrace();
 		}
 
-		logger.info("in getSize - joined");
+		logger.info("getSize - joined");
 		
 		if (alRootFiles.isEmpty()) return -1L;
 		size = 0;
 		for (RootFile rf : alRootFiles) {
 			size += rf.size;
 		}
-		logger.info("in getSize - returning");
+		logger.info("getSize - done");
 		return size;
 	}
 
@@ -126,12 +121,10 @@ public class Dataset {
 				int exitVal = pr.waitFor();
 				if (exitVal != 0) {
 					logger.error("Problem with 'dq2-ls -f'. Exited with code " + exitVal);
-//					done = true;
 					return;
 				}
 				if (alRootFiles.isEmpty()){
 					logger.error("no root files recognized in the output of dq2-ls -f  ");
-//					done = true;
 					return;
 				}
 				// get gLFN path
@@ -144,16 +137,13 @@ public class Dataset {
 					logger.debug(line);
 					line = line.substring(0, line.lastIndexOf("/"));
 					logger.info("DS gLFN: " + line);
-				}
-
-//				exitVal = pr1.waitFor();
-//				if (exitVal != 0) {
-//					logger.error("PROBLEM Exited with code " + exitVal);
-//				} else {
 					setPath(line);
-//				}
-				logger.info("dq2-list-files finished OK.");
-//				done = true;
+					logger.info("dq2-list-files finished OK.");
+					return;
+				}
+				
+				logger.error("PROBLEM in geting gLFN path. Path not set! ");
+
 			} catch (Exception e) {
 				logger.error("unrecognized exception: " + e.getMessage());
 			}
