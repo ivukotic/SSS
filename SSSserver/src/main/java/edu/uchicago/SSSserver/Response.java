@@ -60,7 +60,14 @@ public class Response extends Thread {
 
 		buf.append(DC.getOutputEstimate());
 		
-		buf.append("\nOK");
+		if (outDS != null){
+			// add here check that all the files have been preprocessed.
+			DC.insertJob(outDS, mainTree, treesToCopy, branchesToKeep, cutCode, deliverTo);
+			logger.debug("submitted");
+			buf.append("\nYour job has been submitted.");
+		}
+		else buf.append("\nOK");
+		
 		return buf;
 	}
 
