@@ -33,7 +33,6 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	private HttpRequest request;
 	private boolean readingChunks;
 	/** Buffer that stores the response content */
-//	private StringBuilder buf = new StringBuilder();
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
 
 	private DataSetsBuffer DSB;
@@ -85,15 +84,24 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 				// check if this is md5 and if it is, find the current state of
 				// that datacontainer and return it.
 				logger.info("got md5. Sending results back.");
-				writeResponse(e,DSB.getResponse(pars[0]));
+				writeResponse(e,pars[0]);
 				return;
 			}
 
 			// this is creating a new response.
 			String requestMD5 = MD5(mes);
 			Response resp=DSB.getResponse(requestMD5);
+			if (resp.stage.get()==0){
+				resp.parseParameters(pars);
+			}{
+				logger.info("already had that md5. not parsing again.");
+			}
 			
-			resp.parseParameters(pars);
+			// sending only md5 back
+			writeResponse(e,resp); 
+			// start the thread.
+			
+			if (true) return;
 			
 			logger.info("datasets xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			String[] sSplit = pars[0].split("=");
@@ -273,6 +281,50 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
 	}
 	
+	// this one just sends md5 back. used after initial input parsing.
+	private void writeResponse(MessageEvent e,String md5) {
+		// Decide whether to close the connection or not.
+		boolean keepAlive = isKeepAlive(request);
+
+		// Build the response object.
+		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
+		StringBuilder buf = new StringBuilder();
+		buf.append("md5:"+md5);
+		logger.info("returns:\n" + md5);
+
+		response.setContent(ChannelBuffers.copiedBuffer(buf, CharsetUtil.UTF_8));
+		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
+
+		if (keepAlive) {
+			// Add 'Content-Length' header only for a keep-alive connection.
+			response.setHeader(CONTENT_LENGTH, response.getContent().readableBytes());
+		}
+
+		// Encode the cookie.
+		String cookieString = request.getHeader(COOKIE);
+		if (cookieString != null) {
+			CookieDecoder cookieDecoder = new CookieDecoder();
+			Set<Cookie> cookies = cookieDecoder.decode(cookieString);
+			if (!cookies.isEmpty()) {
+				// Reset the cookies if necessary.
+				CookieEncoder cookieEncoder = new CookieEncoder(true);
+				for (Cookie cookie : cookies) {
+					cookieEncoder.addCookie(cookie);
+				}
+				response.addHeader(SET_COOKIE, cookieEncoder.encode());
+			}
+		}
+
+		// Write the response.
+		ChannelFuture future = e.getChannel().write(response);
+
+		// Close the non-keep-alive connection after the write operation is
+		// done.
+		if (!keepAlive) {
+			future.addListener(ChannelFutureListener.CLOSE);
+		}
+
+	}
 	
 	private void send100Continue(MessageEvent e) {
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, CONTINUE);

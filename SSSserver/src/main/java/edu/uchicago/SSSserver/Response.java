@@ -12,10 +12,11 @@ public class Response {
 	public String md5;
 	private StringBuilder buf = new StringBuilder();
 	// stage starts with 0 
-	// 1 - started dq2-ls
-	// 2 - finished dq2-ls
-	// 3 - started inspecting
-	// 4 - finished inspecting
+	// 1 - parameters set
+	// 2 - started dq2-ls
+	// 3 - finished dq2-ls
+	// 4 - started inspecting
+	// 5 - finished inspecting
 	// ...
 	public AtomicInteger stage = new AtomicInteger();
 	public AtomicInteger openFiles=new AtomicInteger();
@@ -122,7 +123,7 @@ public class Response {
 			}
 		}
 		// ==================================================
-		
+		stage.set(1);
 		
 		
 	}
