@@ -19,28 +19,28 @@ public class DataContainer {
 	private long inpEvents;
 	private long estSize;
 	private long estEvents;
-
+	private int estBranches;
+	
 	public void add(Dataset ds) {
 		dSets.add(ds);
 	}
 
-	
 	public long getInputSize() {
 		long res = 0;
-		boolean needswait=false;
+		boolean needswait = false;
 		for (Dataset ds : dSets) {
-			long dsa=ds.getSize();
-			if (dsa==-1) {
+			long dsa = ds.getSize();
+			if (dsa == -1) {
 				logger.info("ds not known or not in fax.");
 				return -1L;
 			}
-			if (dsa==0){
+			if (dsa == 0) {
 				logger.info("size of this ds not yet known.");
-				needswait=true;
+				needswait = true;
 			}
 			res += dsa;
 		}
-		if (needswait==false)
+		if (needswait == false)
 			return res;
 		else {
 			try {
@@ -64,7 +64,7 @@ public class DataContainer {
 		return t;
 	}
 
-	private void updateTrees() {
+	public void updateTrees() {
 
 		processedfiles = 0;
 		totalfiles = 0;
@@ -87,7 +87,7 @@ public class DataContainer {
 
 	// this one starts chain reaction of inspect-ing root files
 	public String getTreeDetails() {
-		updateTrees();
+		// updateTrees();
 
 		String res = summedTrees.size() + "\n";
 		for (tree st : summedTrees) {
@@ -113,9 +113,9 @@ public class DataContainer {
 		return res;
 	}
 
-	public String getOutputEstimate(String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode) {
+	public void updateOutputEstimate(String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode) {
 		if (mainTree.equalsIgnoreCase("undefined") || branchesToKeep.size() == 0)
-			return "0:0:0:0";
+			return;
 		logger.info("getting estimates. mainTree:" + mainTree);
 		for (String t : treesToCopy)
 			logger.info("tree to copy:" + t);
@@ -123,7 +123,7 @@ public class DataContainer {
 		inpEvents = 0;
 		estSize = 0;
 		estEvents = 0;
-		int estBranches = 0;
+		estBranches = 0;
 
 		if (treesToCopy.contains(mainTree)) {
 			treesToCopy.remove(mainTree);
@@ -153,44 +153,45 @@ public class DataContainer {
 
 		estEvents = inpEvents;
 
+		return;
+	}
+
+	public String getOutputEstimate() {
 		return inpEvents + ":" + estEvents + ":" + estSize + ":" + estBranches;
 	}
 
-	
 	public void insertJob(String outdataset, String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode, String deliverTo) {
 
-		Submitter s=new Submitter();
+		Submitter s = new Submitter();
 		s.connect();
-		String inputdatasets="";
+		String inputdatasets = "";
 		for (Dataset ds : dSets) {
-			inputdatasets+=ds.name+"\n";
+			inputdatasets += ds.name + "\n";
 		}
-		inputdatasets=inputdatasets.trim();
-		
-		String branches="";
-		for (String br:branchesToKeep){
-			branches+=br+"\n";
+		inputdatasets = inputdatasets.trim();
+
+		String branches = "";
+		for (String br : branchesToKeep) {
+			branches += br + "\n";
 		}
-		branches=branches.trim();
-		String tToCopy="";
-		for (String tr:treesToCopy){
-			tToCopy+=tr+"\n";
+		branches = branches.trim();
+		String tToCopy = "";
+		for (String tr : treesToCopy) {
+			tToCopy += tr + "\n";
 		}
-		tToCopy=tToCopy.trim();
-		
-		Integer jobID=s.insertJob( inputdatasets,  outdataset, branches, cutCode, mainTree, tToCopy, deliverTo, inpEvents,getInputSize(),estSize,estEvents );
-		if (jobID>0){
+		tToCopy = tToCopy.trim();
+
+		Integer jobID = s.insertJob(inputdatasets, outdataset, branches, cutCode, mainTree, tToCopy, deliverTo, inpEvents, getInputSize(), estSize, estEvents);
+		if (jobID > 0) {
 			for (Dataset ds : dSets) {
 				ArrayList<RootFile> arf = ds.alRootFiles;
-				for (RootFile rf : arf){
-					s.insertFile(jobID ,rf.getFullgLFN(), rf.size, rf.getEventsInTree(mainTree)  );
+				for (RootFile rf : arf) {
+					s.insertFile(jobID, rf.getFullgLFN(), rf.size, rf.getEventsInTree(mainTree));
 				}
 			}
 		}
-		
-		s.disconnect();
-		
 
+		s.disconnect();
 
 	}
 }

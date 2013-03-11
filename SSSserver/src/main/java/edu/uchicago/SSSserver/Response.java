@@ -20,7 +20,7 @@ public class Response extends Thread {
 	// ...
 	public AtomicInteger stage = new AtomicInteger();
 	public AtomicInteger openFiles = new AtomicInteger();
-
+	
 	public String[] dss;
 	private String mainTree;
 	HashSet<String> treesToCopy = new HashSet<String>();
@@ -29,7 +29,8 @@ public class Response extends Thread {
 	private String outDS;
 	private String deliverTo;
 	private DataContainer DC;
-
+	private long totsize;
+	
 	Response() {
 		buf.setLength(0);
 	}
@@ -39,34 +40,44 @@ public class Response extends Thread {
 	}
 
 	public StringBuilder getStringBuffer() {
+		if (totsize < 0) {
+			buf.append("warning:at least one of the datasets does not exist, or has no root files.");
+			return buf;
+		}
+		buf.append("size:" + String.valueOf(totsize) + "\n");
+		
+		buf.append(DC.getTreeDetails());
+		
+		buf.append(mainTree + "\n");
+		String joinedTrees = "";
+		if (treesToCopy.size() > 0) {
+			for (String c : treesToCopy)
+				joinedTrees += "," + c;
+			joinedTrees = joinedTrees.substring(1);
+		}
+		buf.append(joinedTrees + "\n");
+
+		buf.append(DC.getOutputEstimate());
+		
+		buf.append("\nOK");
 		return buf;
 	}
 
 	public void run() {
 		try {
 			buf.setLength(0);
-			logger.info("Getting DC size.");
-			long totsize = DC.getInputSize();
-			if (totsize < 0) {
-				buf.append("warning:at least one of the datasets does not exist, or has no root files.");
-				return;
-			}
-			logger.info("sizes of aLL input DSs have been found xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			buf.append("size:" + String.valueOf(totsize) + "\n");
+			logger.info("Getting DC size....");
+			totsize = DC.getInputSize();
+			logger.info("sizes of ALL input DSs have been found. ");
+			
+			logger.info("Updating tree info... ");
+			DC.updateTrees();
+			logger.info("Tree info updated. ");
 
-			logger.info("trees xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-			buf.append(mainTree + "\n");
-			String joinedTrees = "";
-			if (treesToCopy.size() > 0) {
-				for (String c : treesToCopy)
-					joinedTrees += "," + c;
-				joinedTrees = joinedTrees.substring(1);
-			}
-			buf.append(joinedTrees + "\n");
-
-			buf.append(DC.getOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode));
-
-			buf.append("\nOK");
+			logger.info("Updating output estimates... ");
+			DC.updateOutputEstimate(mainTree, treesToCopy, branchesToKeep, cutCode);
+			logger.info("Output estimates updated. ");
+			
 		} catch (Exception e) {
 			logger.error("unrecognized exception: " + e.getMessage());
 		}
