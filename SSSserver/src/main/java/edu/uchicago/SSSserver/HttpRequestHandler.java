@@ -342,7 +342,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
 		logger.debug("eXcEpTiOn caught. client broke connection.");
-		e.getCause().printStackTrace();
+//		e.getCause().printStackTrace();
 		e.getChannel().close();
 	}
 
