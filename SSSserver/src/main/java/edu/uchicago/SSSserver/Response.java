@@ -64,7 +64,8 @@ public class Response extends Thread {
 			// add here check that all the files have been preprocessed.
 			DC.insertJob(outDS, mainTree, treesToCopy, branchesToKeep, cutCode, deliverTo);
 			logger.info("submitted");
-			buf.append("\nYour job has been submitted.");
+			buf.setLength(0);
+			buf.append("message:Your job has been submitted.");
 		}
 		else buf.append("\nOK");
 		
