@@ -87,7 +87,7 @@ public class DataContainer {
 
 	// this one starts chain reaction of inspect-ing root files
 	public String getTreeDetails() {
-		// updateTrees();
+		 updateTrees();
 
 		String res = summedTrees.size() + "\n";
 		for (tree st : summedTrees) {
