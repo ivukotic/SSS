@@ -67,25 +67,27 @@ public class Receiver {
 			// cs.close();
 
 			logger.debug("Tasks were set");
-			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK(?,?,?,?,?,?,?,?)}");
+			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK(?,?,?,?,?,?,?,?,?)}");
 			cs1.registerOutParameter(1, Types.INTEGER);
-			cs1.registerOutParameter(2, Types.VARCHAR);
-			cs1.registerOutParameter(3, Types.CLOB);
+			cs1.registerOutParameter(2, Types.INTEGER);
+			cs1.registerOutParameter(3, Types.VARCHAR);
 			cs1.registerOutParameter(4, Types.CLOB);
-			cs1.registerOutParameter(5, Types.VARCHAR);
+			cs1.registerOutParameter(5, Types.CLOB);
 			cs1.registerOutParameter(6, Types.VARCHAR);
 			cs1.registerOutParameter(7, Types.VARCHAR);
 			cs1.registerOutParameter(8, Types.VARCHAR);
+			cs1.registerOutParameter(9, Types.VARCHAR);
 
 			cs1.executeQuery();
 			task.id = cs1.getInt(1);
-			task.outFile = cs1.getString(2);
-			task.branches = cs1.getString(3);
-			task.cut = cs1.getString(4);
-			task.tree = cs1.getString(5);
-			task.treesToCopy = cs1.getString(6);
-			task.dataset = cs1.getString(7);
-			task.deliverTo = cs1.getString(8);
+			task.jID = cs1.getInt(2);
+			task.outFile = cs1.getString(3);
+			task.branches = cs1.getString(4);
+			task.cut = cs1.getString(5);
+			task.tree = cs1.getString(6);
+			task.treesToCopy = cs1.getString(7);
+			task.dataset = cs1.getString(8);
+			task.deliverTo = cs1.getString(9);
 			cs1.close();
 
 		} catch (SQLException sqle) {

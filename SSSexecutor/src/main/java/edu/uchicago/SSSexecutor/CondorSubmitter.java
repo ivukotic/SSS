@@ -24,9 +24,9 @@ public class CondorSubmitter implements Submitter {
 			BufferedWriter out = new BufferedWriter(fstream);
 			String res = "getenv   = False\n";
 			res += "executable     = " + fn + "sh\n";
-			res += "output         = " + fn + "out\n";
-			res += "error          = " + fn + "error\n";
-			res += "log            = " + fn + "log\n";
+			res += "output         = log_"+task.jID.toString()+"/" + fn + "out\n";
+			res += "error          = log_"+task.jID.toString()+"/" + fn + "error\n";
+			res += "log            = log_"+task.jID.toString()+"/" + fn + "log\n";
 			String filesToTransfer = "filter-and-merge-d3pd.py,.OracleAccess.txt,";
 			filesToTransfer += "/tmp/x509up_u20074,";
 			filesToTransfer += fn+"inputFileList,";

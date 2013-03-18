@@ -13,6 +13,7 @@ public class Task {
 	final Logger logger = LoggerFactory.getLogger(Task.class);
 
 	public Integer id = 0;
+	public Integer jID=0;
 	public Integer queueID=0;
 	public String outFile;
 	public String dataset;
@@ -25,6 +26,7 @@ public class Task {
 
 	public void print() {
 		logger.info("taskID:       " + id.toString());
+		logger.info("jobID:        " + jID.toString());
 		logger.info("queueID:      " + queueID.toString());
 		logger.info("outFile:      " + outFile);
 		logger.info("dataset:      " + dataset);
