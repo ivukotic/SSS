@@ -20,7 +20,7 @@ public class DataContainer {
 	private long estSize;
 	private long estEvents;
 	private int estBranches;
-	
+
 	public void add(Dataset ds) {
 		dSets.add(ds);
 	}
@@ -87,7 +87,7 @@ public class DataContainer {
 
 	// this one starts chain reaction of inspect-ing root files
 	public String getTreeDetails() {
-		 updateTrees();
+		updateTrees();
 
 		String res = summedTrees.size() + "\n";
 		for (tree st : summedTrees) {
@@ -162,8 +162,6 @@ public class DataContainer {
 
 	public void insertJob(String outdataset, String mainTree, HashSet<String> treesToCopy, HashSet<String> branchesToKeep, String cutCode, String deliverTo) {
 
-		Submitter s = new Submitter();
-		s.connect();
 		String inputdatasets = "";
 		for (Dataset ds : dSets) {
 			inputdatasets += ds.name + "\n";
@@ -181,17 +179,16 @@ public class DataContainer {
 		}
 		tToCopy = tToCopy.trim();
 
-		Integer jobID = s.insertJob(inputdatasets, outdataset, branches, cutCode, mainTree, tToCopy, deliverTo, inpEvents, getInputSize(), estSize, estEvents);
-		if (jobID > 0) {
-			for (Dataset ds : dSets) {
-				ArrayList<RootFile> arf = ds.alRootFiles;
-				for (RootFile rf : arf) {
-					s.insertFile(jobID, rf.getFullgLFN(), rf.size, rf.getEventsInTree(mainTree));
-				}
+		Submitter s = new Submitter();
+		s.setValues(inputdatasets, outdataset, branches, cutCode, mainTree, tToCopy, deliverTo, inpEvents, getInputSize(), estSize, estEvents);
+		
+		for (Dataset ds : dSets) {
+			ArrayList<RootFile> arf = ds.alRootFiles;
+			for (RootFile rf : arf) {
+				s.setFile(rf.getFullgLFN(), rf.size, rf.getEventsInTree(mainTree));
 			}
 		}
-
-		s.disconnect();
-
+		s.start();
+		
 	}
 }

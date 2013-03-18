@@ -44,7 +44,7 @@ public class SSSexecutor {
 	public static void waitAminute() {
 		try {
 			logger.info("----------------");
-			Thread.currentThread().sleep(60000);
+			Thread.currentThread().sleep(30000);
 		} catch (Exception e) {
 		}
 	}
@@ -65,20 +65,31 @@ public class SSSexecutor {
 		Receiver r = new Receiver();
 		r.connect();
 
-		while (true) {
+		CondorSubmitter s = new CondorSubmitter();
 
+		while (true) {
+			
+			boolean wait=true;
 			// first check number of idle jobs for this user
 			if (getNumberOfIdleJobs() < 2) {
 
 				Task task = r.getJob();
 				if (task.id > 0) {
 					task.print();
-					CondorSubmitter s = new CondorSubmitter();
 					s.submit(task);
-				} else 
-					waitAminute();
+					wait=false;
+				}
 
-			}else
+			}
+			
+			Task taskToKill = r.getJobToKill();
+			if (taskToKill.id>0){
+				taskToKill.print();
+				s.kill(taskToKill);
+				wait=false;
+			} 
+			
+			if (wait==true)
 				waitAminute();
 		}
 

@@ -25,19 +25,18 @@
 "/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="os.name" value="Mac OS X"/>
-    <property name="classworlds.conf" value="/Users/ivukotic/work/workspace/.metadata/.plugins/org.eclipse.m2e.core/launches/m2conf1882350909749892169.tmp"/>
+    <property name="classworlds.conf" value="/Users/ivukotic/work/workspace/.metadata/.plugins/org.eclipse.m2e.core/launches/m2conf2576387894114784217.tmp"/>
     <property name="sun.jnu.encoding" value="US-ASCII"/>
     <property name="java.library.path" value="/Users/ivukotic/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="51.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="os.version" value="10.8.2"/>
-    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="user.home" value="/Users/ivukotic"/>
     <property name="user.timezone" value="Europe/Zurich"/>
     <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob"/>
-    <property name="java.specification.version" value="1.7"/>
     <property name="file.encoding" value="US-ASCII"/>
+    <property name="java.specification.version" value="1.7"/>
     <property name="user.name" value="ivukotic"/>
     <property name="java.class.path" value="/Applications/eclipse/configuration/org.eclipse.osgi/bundles/239/1/.cp/jars/plexus-classworlds-2.4.jar"/>
     <property name="java.vm.specification.version" value="1.7"/>
@@ -57,8 +56,6 @@
     <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
-    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
-    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
   <testcase time="0.001" classname="edu.uchicago.sender.AppTest" name="testApp"/>

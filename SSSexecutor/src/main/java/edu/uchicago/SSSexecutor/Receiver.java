@@ -112,4 +112,31 @@ public class Receiver {
 		return task;
 	}
 
+	public Task getJobToKill(){
+		logger.debug("getJobToKill ...");
+		Task task = new Task();
+		try {
+
+
+			logger.debug("Tasks were set");
+			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK_TO_KILL(?,?,?)}");
+			cs1.registerOutParameter(1, Types.INTEGER);
+			cs1.registerOutParameter(2, Types.INTEGER);
+			cs1.registerOutParameter(3, Types.VARCHAR);
+
+			cs1.executeQuery();
+			task.id = cs1.getInt(1);
+			task.queueID=cs1.getInt(2);
+			task.outFile = cs1.getString(3);
+			cs1.close();
+
+		} catch (SQLException sqle) {
+			logger.error("SSS_GET_TASK_TO_KILL:" + sqle.getMessage());
+		} catch (Exception e) {
+			logger.error("SSS_GET_TASK_TO_KILL:" + e.getMessage());
+		}
+
+		logger.debug("getJobToKill done.");
+		return task;
+	}
 }

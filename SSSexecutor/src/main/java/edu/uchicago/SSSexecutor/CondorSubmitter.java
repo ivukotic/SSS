@@ -92,4 +92,33 @@ public class CondorSubmitter implements Submitter {
 		}
 
 	}
+
+	@Override
+	public void kill(Task task) {
+		logger.info("killing task...");
+		Runtime rt = Runtime.getRuntime();
+		String[] comm = { "condor_delete", task.queueID.toString() };
+		try {
+			Process proc = rt.exec(comm);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+
+			// read the output from the submit command
+			logger.info("kill output:\n");
+			String s;
+			while ((s = stdInput.readLine()) != null) {
+				logger.info(s);
+			}
+
+			// read any errors from the kill command
+			while ((s = stdError.readLine()) != null) {
+				logger.error("there is an error from kill command...");
+				logger.error(s);
+			}
+			
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+	}
 }
