@@ -12,7 +12,7 @@ public class CondorSubmitter implements Submitter {
 
 	final Logger logger = LoggerFactory.getLogger(CondorSubmitter.class);
 
-	public void submit(Task task) {
+	public Integer submit(Task task) {
 
 		task.createFiles();
 
@@ -75,10 +75,13 @@ public class CondorSubmitter implements Submitter {
 			BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
 			// read the output from the submit command
-			logger.info("submit output:\n");
+			logger.info("submit output:");
 			String s;
 			while ((s = stdInput.readLine()) != null) {
 				logger.info(s);
+				if (s.indexOf("submitted to cluster ")>0){
+					return Integer.parseInt(s.substring(s.indexOf("cluster ")+8));
+				}
 			}
 
 			// read any errors from the submit command
@@ -91,6 +94,7 @@ public class CondorSubmitter implements Submitter {
 			logger.error(ex.getMessage());
 		}
 
+		return 0;
 	}
 
 	@Override

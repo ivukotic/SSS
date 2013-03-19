@@ -113,7 +113,21 @@ public class Receiver {
 		logger.debug("getJob done");
 		return task;
 	}
-
+	
+	public void setQID(Integer tid, Integer qid){
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("UPDATE SSS_SUBJOBS SET queueID="+qid.toString()+" where taskid=" + tid.toString());
+			rs.close();
+			stmt.close();
+		} catch (SQLException sqle) {
+			logger.error("in UPDATE SSS_SUBJOBS SET queueID " + sqle.getMessage());
+		} catch (Exception e) {
+			logger.error("in UPDATE SSS_SUBJOBS SET queueID :" + e.getMessage());
+		}
+		
+	}
+	
 	public Task getJobToKill(){
 		logger.debug("getJobToKill ...");
 		Task task = new Task();

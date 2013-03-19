@@ -76,7 +76,9 @@ public class SSSexecutor {
 				Task task = r.getJob();
 				if (task.id > 0) {
 					task.print();
-					s.submit(task);
+					Integer queueID=s.submit(task);
+					if (queueID>0)
+						r.setQID(task.id, queueID);
 					wait=false;
 				}
 
