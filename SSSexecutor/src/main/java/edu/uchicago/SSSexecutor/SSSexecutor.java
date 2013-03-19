@@ -87,7 +87,6 @@ public class SSSexecutor {
 			
 			Task taskToKill = r.getJobToKill();
 			if (taskToKill.id>0){
-				taskToKill.print();
 				s.kill(taskToKill);
 				wait=false;
 			} 

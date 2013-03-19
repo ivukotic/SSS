@@ -101,8 +101,9 @@ public class CondorSubmitter implements Submitter {
 	@Override
 	public void kill(Task task) {
 		logger.info("killing task...");
+		task.print();
 		Runtime rt = Runtime.getRuntime();
-		String[] comm = { "condor_delete", task.queueID.toString() };
+		String[] comm = { "condor_rm", task.queueID.toString() };
 		try {
 			Process proc = rt.exec(comm);
 
