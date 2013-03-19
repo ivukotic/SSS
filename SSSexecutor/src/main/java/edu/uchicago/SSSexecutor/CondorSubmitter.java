@@ -17,16 +17,16 @@ public class CondorSubmitter implements Submitter {
 		task.createFiles();
 
 		logger.info("creating condor submission script");
-		String fn = "SSS_" + task.id + ".";
+		String fn = "SSS_" +task.jID.toString()+"_"+task.id + ".";
 
 		try { // script to execute
 			FileWriter fstream = new FileWriter(fn + "submit");
 			BufferedWriter out = new BufferedWriter(fstream);
 			String res = "getenv   = False\n";
 			res += "executable     = " + fn + "sh\n";
-			res += "output         = log_"+task.jID.toString()+"/" + fn + "out\n";
-			res += "error          = log_"+task.jID.toString()+"/" + fn + "error\n";
-			res += "log            = log_"+task.jID.toString()+"/" + fn + "log\n";
+			res += "output         = " + fn + "out\n";
+			res += "error          = " + fn + "error\n";
+			res += "log            = " + fn + "log\n";
 			String filesToTransfer = "filter-and-merge-d3pd.py,.OracleAccess.txt,";
 			filesToTransfer += "/tmp/x509up_u20074,";
 			filesToTransfer += fn+"inputFileList,";
