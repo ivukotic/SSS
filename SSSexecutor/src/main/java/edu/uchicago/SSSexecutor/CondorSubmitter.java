@@ -80,6 +80,7 @@ public class CondorSubmitter implements Submitter {
 			while ((s = stdInput.readLine()) != null) {
 				logger.info(s);
 				if (s.indexOf("submitted to cluster ")>0){
+					s=s.replace(".","");
 					return Integer.parseInt(s.substring(s.indexOf("cluster ")+8));
 				}
 			}
