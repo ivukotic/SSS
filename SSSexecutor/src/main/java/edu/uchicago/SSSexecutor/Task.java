@@ -42,7 +42,7 @@ public class Task {
 	}
 
 	public void createFiles() {
-		String fn = "SSS_" + id + ".";
+		String fn = "SSS_" +jID.toString()+"_"+id + ".";
 
 		String redi = System.getenv("STORAGEPREFIX");
 		if (redi == null) {
