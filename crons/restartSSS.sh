@@ -6,7 +6,7 @@ export dbpass=...
 source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
 source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --skipConfirm --dq2ClientVersion current
 
-voms-proxy-init -cert $HOME/.globus/usercert.pem -key $HOME/.globus/userkey.pem -voms atlas -pwstdin < $HOME/gridlozinka.txt
+voms-proxy-init -cert $HOME/.globus/usercert.pem -key $HOME/.globus/userkey.pem -voms atlas -valid 96:0 -pwstdin < $HOME/gridlozinka.txt
 
 if [ -f "/tmp/.SSSserver.proc" ] 
 then
