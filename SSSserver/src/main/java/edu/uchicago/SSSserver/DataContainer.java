@@ -101,15 +101,15 @@ public class DataContainer {
 	private ArrayList<tree> getTrees(Dataset ds) {
 		logger.info("getting tree info from DS: " + ds.name);
 		ArrayList<tree> res = ds.getTrees();
-		if (res.size() == 0) {
-			try {
-				logger.info("trees not returned. waiting 5 seconds before retry.");
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			res = getTrees(ds);
-		}
+//		if (res.size() == 0) {
+//			try {
+//				logger.info("trees not returned. waiting 5 seconds before retry.");
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			res = getTrees(ds);
+//		}
 		return res;
 	}
 

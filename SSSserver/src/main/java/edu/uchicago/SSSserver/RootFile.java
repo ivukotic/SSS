@@ -109,6 +109,8 @@ public class RootFile {
 
 			} catch (Exception e) {
 				logger.error("unrecognized exception: " + e.getMessage());
+				started = false;
+				done = false;
 			}
 			done=true;
 			

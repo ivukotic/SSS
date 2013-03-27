@@ -166,6 +166,7 @@ public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
 		Response result=DSB.getResponse(md5);
 		if (result==null){
+			logger.info("result not ready/found in DSB.");
 			return;
 		}
 
