@@ -56,9 +56,12 @@ public class DataContainer {
 	private tree getTree(String name) {
 		for (tree t : summedTrees) {
 			if (t.getName().equals(name)) {
+				logger.info("tree already exists in summ will return that one");
 				return t;
 			}
 		}
+
+		logger.info("a new tree will create it from scratch in summ.");
 		tree t = new tree();
 		summedTrees.add(t);
 		return t;
@@ -80,12 +83,10 @@ public class DataContainer {
 			processedfiles += ds.processed;
 			totalfiles += ds.alRootFiles.size();
 			
-			logger.info("HERE.");
-			
 			for (tree t : ts) {
-				logger.info("added tree:"+t.getName());
+				logger.info("adding tree:"+t.getName());
 				getTree(t.getName()).add(t);
-				logger.info("added done.");
+				logger.info("added. done.");
 			}
 
 			logger.info("getting tree info from DS: " + ds.name+" DONE.");
