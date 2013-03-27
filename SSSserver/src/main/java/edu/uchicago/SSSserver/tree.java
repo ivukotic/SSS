@@ -53,6 +53,7 @@ public class tree {
 	}
 	
 	public void add(tree treeToAdd){
+		logger.info("Adding tree: "+ treeToAdd.name +" on existing tree named: "+name);
 		if (!name.equals(treeToAdd.name)){
 			if (name.isEmpty()) {
 				name=treeToAdd.name;
@@ -64,8 +65,14 @@ public class tree {
 				return;
 			}
 		}
+
+		logger.info("Adding events. ");
 		events+=treeToAdd.getEvents();
+		
+		logger.info("Adding size. ");
 		size+=treeToAdd.getSize();
+
+		logger.info("Adding branches. ");
 		for (Map.Entry<String,Long> br:m_branches.entrySet()){
 			Long ntbs=treeToAdd.getBranchSize(br.getKey());
 			if (ntbs==null) {
