@@ -79,8 +79,11 @@ public class DataContainer {
 
 			processedfiles += ds.processed;
 			totalfiles += ds.alRootFiles.size();
-
+			
+			logger.info("HERE.");
+			
 			for (tree t : ts) {
+				logger.info("added tree:"+t.getName());
 				getTree(t.getName()).add(t);
 			}
 
@@ -117,7 +120,7 @@ public class DataContainer {
 //			res = getTrees(ds);
 //		}
 
-		logger.info("got" + res.size() +" trees.");
+		logger.info("got " + res.size() +" trees.");
 		return res;
 	}
 
