@@ -99,7 +99,7 @@ public class DataContainer {
 	}
 
 	private ArrayList<tree> getTrees(Dataset ds) {
-		logger.info("getting tree info from DS: " + ds.name);
+		logger.info("getting tree info from DS: " + ds.name+" ...");
 		ArrayList<tree> res = ds.getTrees();
 //		if (res.size() == 0) {
 //			try {
@@ -110,6 +110,8 @@ public class DataContainer {
 //			}
 //			res = getTrees(ds);
 //		}
+
+		logger.info("getting tree info from DS: " + ds.name+" DONE.");
 		return res;
 	}
 

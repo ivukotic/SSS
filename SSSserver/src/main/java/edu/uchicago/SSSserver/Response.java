@@ -68,7 +68,9 @@ public class Response extends Thread {
 			buf.append("message:Your job has been submitted.");
 		}
 		else buf.append("\nOK");
-		
+
+		logger.info("Sending response:");
+		logger.info(buf.toString());
 		return buf;
 	}
 
