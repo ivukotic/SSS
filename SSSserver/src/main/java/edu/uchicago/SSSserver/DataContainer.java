@@ -71,6 +71,8 @@ public class DataContainer {
 		summedTrees.clear();
 
 		for (Dataset ds : dSets) {
+
+			logger.info("getting tree info from DS: " + ds.name+" ...");
 			ArrayList<tree> ts = getTrees(ds);
 			if (ts.size() == 0)
 				continue;
@@ -82,11 +84,13 @@ public class DataContainer {
 				getTree(t.getName()).add(t);
 			}
 
+			logger.info("getting tree info from DS: " + ds.name+" DONE.");
 		}
 	}
 
 	// this one starts chain reaction of inspect-ing root files
 	public String getTreeDetails() {
+		logger.info("Updating tree details ...");
 		updateTrees();
 
 		String res = summedTrees.size() + "\n";
@@ -95,11 +99,13 @@ public class DataContainer {
 		}
 		res += totalfiles + ":" + processedfiles + "\n";
 		logger.info("total files: " + totalfiles + "\tprocessed files: " + processedfiles + "\n");
+
+		logger.info("Updating tree details DONE");
 		return res;
 	}
 
 	private ArrayList<tree> getTrees(Dataset ds) {
-		logger.info("getting tree info from DS: " + ds.name+" ...");
+		logger.info("getting trees ...");
 		ArrayList<tree> res = ds.getTrees();
 //		if (res.size() == 0) {
 //			try {
@@ -111,7 +117,7 @@ public class DataContainer {
 //			res = getTrees(ds);
 //		}
 
-		logger.info("getting tree info from DS: " + ds.name+" DONE.");
+		logger.info("got" + res.size() +" trees.");
 		return res;
 	}
 
