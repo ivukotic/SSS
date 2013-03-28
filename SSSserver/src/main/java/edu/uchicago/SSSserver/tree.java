@@ -66,10 +66,8 @@ public class tree {
 			}
 		}
 
-		logger.info("Adding events. ");
+		logger.info("Adding events, size ");
 		events+=treeToAdd.getEvents();
-		
-		logger.info("Adding size. ");
 		size+=treeToAdd.getSize();
 
 		logger.info("Adding branches. ");
@@ -81,7 +79,8 @@ public class tree {
 				br.setValue(br.getValue()+ntbs);
 			}
 		}
-		
+
+		logger.info("Branches added. ");
 	}
 	
 	public String toString(){
