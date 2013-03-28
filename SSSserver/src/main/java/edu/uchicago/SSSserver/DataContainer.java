@@ -85,7 +85,7 @@ public class DataContainer {
 			
 			for (tree t : ts) {
 				logger.info("adding tree:"+t.getName());
-				getTree(t.getName()).add(t);
+//				getTree(t.getName()).add(t);
 				logger.info("added. done.");
 			}
 
