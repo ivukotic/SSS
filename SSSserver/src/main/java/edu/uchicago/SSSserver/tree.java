@@ -71,14 +71,14 @@ public class tree {
 		size+=treeToAdd.getSize();
 
 		logger.info("Adding branches. ");
-		for (Map.Entry<String,Long> br:m_branches.entrySet()){
-			Long ntbs=treeToAdd.getBranchSize(br.getKey());
-			if (ntbs==null) {
-				logger.error("branch: "+br.getKey()+" is missing from one of the files.");
-			}else{
-				br.setValue(br.getValue()+ntbs);
-			}
-		}
+//		for (Map.Entry<String,Long> br:m_branches.entrySet()){
+//			Long ntbs=treeToAdd.getBranchSize(br.getKey());
+//			if (ntbs==null) {
+//				logger.error("branch: "+br.getKey()+" is missing from one of the files.");
+//			}else{
+//				br.setValue(br.getValue()+ntbs);
+//			}
+//		}
 
 		logger.info("Branches added. ");
 	}
