@@ -70,8 +70,9 @@ public class tree {
 			}
 		}
 
-		logger.info("Adding events, size ");
+		logger.info("Adding events ");
 		events+=treeToAdd.getEvents();
+		logger.info("Adding size ");
 		size+=treeToAdd.getSize();
 
 		logger.info("Adding branches. ");
