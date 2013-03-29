@@ -60,9 +60,10 @@ public class tree {
 		if (!name.equals(treeToAdd.name)){
 			if (name.isEmpty()) {
 				name=treeToAdd.name;
-				for (Map.Entry<String,Long> br:treeToAdd.getBranches().entrySet()){
-					m_branches.put(br.getKey(), 0L);
-				}
+				m_branches.putAll(treeToAdd.m_branches);
+//				for (Map.Entry<String,Long> br:treeToAdd.getBranches().entrySet()){
+//					m_branches.put(br.getKey(), 0L);
+//				}
 			}else{
 				logger.error("Can't sum up different trees: "+name+" and "+treeToAdd.name);
 				return;
@@ -75,7 +76,7 @@ public class tree {
 
 		logger.info("Adding branches. ");
 		for (Map.Entry<String,Long> br:m_branches.entrySet()){
-			Long ntbs=treeToAdd.getBranchSize(br.getKey());
+//			Long ntbs=treeToAdd.getBranchSize(br.getKey());
 //			if (ntbs==null) {
 //				logger.error("branch: "+br.getKey()+" is missing from one of the files.");
 //			}else{
