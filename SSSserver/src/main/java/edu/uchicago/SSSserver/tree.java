@@ -16,7 +16,11 @@ public class tree {
 	
 	private HashMap<String,Long> m_branches=new HashMap<String, Long>();
 	
-	tree(){}
+	tree(){
+		events=0L;
+		size=0L;
+	}
+	
 	tree(String na, Integer ev, Long si){
 		name=na;
 		events=ev.longValue();
