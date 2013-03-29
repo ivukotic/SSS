@@ -56,12 +56,12 @@ public class DataContainer {
 	private tree getTree(String name) {
 		for (tree t : summedTrees) {
 			if (t.getName().equals(name)) {
-				logger.info("tree already exists in summ will return that one");
+				logger.debug("tree already exists in summ will return that one");
 				return t;
 			}
 		}
 
-		logger.info("a new tree will create it from scratch in summ.");
+		logger.debug("a new tree will create it from scratch in summ.");
 		tree t = new tree();
 		summedTrees.add(t);
 		return t;
@@ -75,27 +75,27 @@ public class DataContainer {
 
 		for (Dataset ds : dSets) {
 
-			logger.info("getting tree info from DS: " + ds.name+" ...");
+			logger.info("getting tree info from DS: " + ds.name + " ...");
 			ArrayList<tree> ts = getTrees(ds);
 			if (ts.size() == 0)
 				continue;
 
 			processedfiles += ds.processed;
 			totalfiles += ds.alRootFiles.size();
-			
+
 			for (tree t : ts) {
-				logger.info("adding tree:"+t.getName());
+				// logger.debug("adding tree:"+t.getName());
 				getTree(t.getName()).add(t);
-				logger.info("added. done.");
+				// logger.debug("added. done.");
 			}
 
-			logger.info("getting tree info from DS: " + ds.name+" DONE.");
+			logger.info("getting tree info from DS: " + ds.name + " DONE.");
 		}
 	}
 
 	// this one starts chain reaction of inspect-ing root files
 	public String getTreeDetails() {
-		logger.info("Updating tree details ...");
+		logger.debug("Updating tree details ...");
 		updateTrees();
 
 		String res = summedTrees.size() + "\n";
@@ -103,26 +103,17 @@ public class DataContainer {
 			res += st.getName() + ":" + st.getEvents() + ":" + st.getSize() + ":" + st.getNBranches() + "\n";
 		}
 		res += totalfiles + ":" + processedfiles + "\n";
-		logger.info("total files: " + totalfiles + "\tprocessed files: " + processedfiles + "\n");
+		logger.debug("total files: " + totalfiles + "\tprocessed files: " + processedfiles + "\n");
 
-		logger.info("Updating tree details DONE");
+		logger.debug("Updating tree details DONE");
 		return res;
 	}
 
 	private ArrayList<tree> getTrees(Dataset ds) {
-		logger.info("getting trees ...");
+		logger.debug("getting trees ...");
 		ArrayList<tree> res = ds.getTrees();
-//		if (res.size() == 0) {
-//			try {
-//				logger.info("trees not returned. waiting 5 seconds before retry.");
-//				Thread.sleep(5000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//			res = getTrees(ds);
-//		}
 
-		logger.info("got " + res.size() +" trees.");
+		logger.debug("got " + res.size() + " trees.");
 		return res;
 	}
 
@@ -194,7 +185,7 @@ public class DataContainer {
 
 		Submitter s = new Submitter();
 		s.setValues(inputdatasets, outdataset, branches, cutCode, mainTree, tToCopy, deliverTo, inpEvents, getInputSize(), estSize, estEvents);
-		
+
 		for (Dataset ds : dSets) {
 			ArrayList<RootFile> arf = ds.alRootFiles;
 			for (RootFile rf : arf) {
@@ -202,6 +193,6 @@ public class DataContainer {
 			}
 		}
 		s.start();
-		
+
 	}
 }

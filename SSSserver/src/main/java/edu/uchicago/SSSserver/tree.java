@@ -61,38 +61,33 @@ public class tree {
 	}
 
 	public void add(tree treeToAdd) {
-		// logger.info("Adding tree: " + treeToAdd.name +
+		// logger.debug("Adding tree: " + treeToAdd.name +
 		// " on existing tree named: " + name);
 		if (!name.equals(treeToAdd.name)) {
 			if (name.isEmpty()) {
 				name = treeToAdd.name;
 				m_branches.putAll(treeToAdd.m_branches);
-				// for (Map.Entry<String,Long>
-				// br:treeToAdd.getBranches().entrySet()){
-				// m_branches.put(br.getKey(), 0L);
-				// }
 			} else {
 				logger.error("Can't sum up different trees: " + name + " and " + treeToAdd.name);
 				return;
 			}
 		}
 
-		// logger.info("Adding events ");
+		// logger.debug("Adding events,size ");
 		events += treeToAdd.getEvents();
-		// logger.info("Adding size ");
 		size += treeToAdd.getSize();
 
-		// logger.info("Adding branches. ");
+		// logger.debug("Adding branches. ");
 		for (Map.Entry<String, Long> br : m_branches.entrySet()) {
 			Long ntbs = treeToAdd.getBranchSize(br.getKey());
 			if (ntbs != null) {
 				br.setValue(br.getValue() + ntbs);
 			}
 			// else
-			// logger.error("branch: "+br.getKey()+" is missing from one of the files.");
+			// logger.debug("branch: "+br.getKey()+" is missing from one of the files.");
 		}
 
-		// logger.info("Branches added. ");
+		// logger.debug("Branches added. ");
 	}
 
 	public String toString() {
