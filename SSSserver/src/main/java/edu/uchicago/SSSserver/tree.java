@@ -11,15 +11,15 @@ public class tree {
 	final Logger logger = LoggerFactory.getLogger(tree.class);
 	
 	private String name="";
-	private long events;
-	private long size;
+	private Long events;
+	private Long size;
 	
 	private HashMap<String,Long> m_branches=new HashMap<String, Long>();
 	
 	tree(){}
-	tree(String na, long ev, long si){
+	tree(String na, Integer ev, Long si){
 		name=na;
-		events=ev;
+		events=ev.longValue();
 		size=si;
 		logger.debug("created tree: "+toString());
 	}
@@ -32,11 +32,11 @@ public class tree {
 		return name;
 	}
 	
-	public long getEvents(){
+	public Long getEvents(){
 		return events;
 	}
 
-	public long getSize(){
+	public Long getSize(){
 		return size;
 	}
 	
@@ -44,8 +44,11 @@ public class tree {
 		return m_branches.size();
 	}
 
-	public long getBranchSize(String brname){
-		return m_branches.get(brname);
+	public Long getBranchSize(String brname){
+		Long res=m_branches.get(brname);
+		if (res!=null) return res;
+		logger.info("Branch: "+brname +" not found!");
+		return 0L;
 	}
 	
 	public HashMap<String,Long> getBranches(){
