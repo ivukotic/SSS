@@ -72,7 +72,7 @@ public class tree {
 
 		logger.info("Adding branches. ");
 		for (Map.Entry<String,Long> br:m_branches.entrySet()){
-//			Long ntbs=treeToAdd.getBranchSize(br.getKey());
+			Long ntbs=treeToAdd.getBranchSize(br.getKey());
 //			if (ntbs==null) {
 //				logger.error("branch: "+br.getKey()+" is missing from one of the files.");
 //			}else{
