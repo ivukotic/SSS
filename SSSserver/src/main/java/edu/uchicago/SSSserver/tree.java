@@ -52,7 +52,7 @@ public class tree {
 		Long res=m_branches.get(brname);
 		if (res!=null) return res;
 		logger.info("Branch: "+brname +" not found!");
-		return 0L;
+		return null;
 	}
 	
 	public HashMap<String,Long> getBranches(){
@@ -74,19 +74,19 @@ public class tree {
 			}
 		}
 
-		logger.info("Adding events ");
+//		logger.info("Adding events ");
 		events+=treeToAdd.getEvents();
-		logger.info("Adding size ");
+//		logger.info("Adding size ");
 		size+=treeToAdd.getSize();
 
 		logger.info("Adding branches. ");
 		for (Map.Entry<String,Long> br:m_branches.entrySet()){
 			Long ntbs=treeToAdd.getBranchSize(br.getKey());
-//			if (ntbs==null) {
+			if (ntbs==null) {
 //				logger.error("branch: "+br.getKey()+" is missing from one of the files.");
-//			}else{
-//				br.setValue(br.getValue()+ntbs);
-//			}
+			}else{
+				br.setValue(br.getValue()+ntbs);
+			}
 		}
 
 		logger.info("Branches added. ");
