@@ -67,6 +67,9 @@ public class tree {
 			if (name.isEmpty()) {
 				name = treeToAdd.name;
 				m_branches.putAll(treeToAdd.m_branches);
+				events += treeToAdd.getEvents();
+				size += treeToAdd.getSize();
+				return;
 			} else {
 				logger.error("Can't sum up different trees: " + name + " and " + treeToAdd.name);
 				return;
