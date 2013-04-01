@@ -80,13 +80,11 @@ public class tree {
 		events += treeToAdd.getEvents();
 		size += treeToAdd.getSize();
 
-		 logger.info("Adding branches. ");
+		// logger.info("Adding branches. ");
 		for (Map.Entry<String, Long> br : m_branches.entrySet()) {
 			Long ntbs = treeToAdd.getBranchSize(br.getKey());
-			if (br.getKey().equals("vxp_z")) 
-				logger.info("vxp_z size to ADD: "+ntbs.toString() + "prev: "+br.getValue().toString());
 			if (ntbs != null) {
-				Long prevSize=br.getValue();
+				Long prevSize = br.getValue();
 				br.setValue(prevSize + ntbs);
 			}
 			// else
