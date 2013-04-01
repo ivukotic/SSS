@@ -107,7 +107,7 @@ public class Submitter extends Thread {
 		Integer jobID = 0;
 		PreparedStatement statement = null;
 		try {
-			String SQL_INSERT = "INSERT INTO SSS_JOBS (OUTDATASET,CBRANCHES,CCUT,TREE,TREESTOKEEP,INDATASETS,DELIVERTO,INPUTEVENTS,INPUTSIZE,OUTPUTSIZE,OUTPUTEVENTS) values (?,?,?,?,?,?,?,?,?,?,?)";
+			String SQL_INSERT = "INSERT INTO ATLAS_WANHCTEST.SSS_JOBS (OUTDATASET,CBRANCHES,CCUT,TREE,TREESTOKEEP,INDATASETS,DELIVERTO,INPUTEVENTS,INPUTSIZE,OUTPUTSIZE,OUTPUTEVENTS) values (?,?,?,?,?,?,?,?,?,?,?)";
 			statement = conn.prepareStatement(SQL_INSERT);
 			statement.setString(1, outdataset);
 			statement.setString(2, branches);
@@ -123,7 +123,7 @@ public class Submitter extends Thread {
 			statement.executeUpdate();
 
 			Statement getAutoGenValueStatement = conn.createStatement();
-			ResultSet rs = getAutoGenValueStatement.executeQuery("select SSS_JOBS_SEQ.currval from dual");
+			ResultSet rs = getAutoGenValueStatement.executeQuery("select ATLAS_WANHCTEST.SSS_JOBS_SEQ.currval from dual");
 			if (rs.next()) {
 				jobID = rs.getInt(1);
 				logger.info("inserted jobid: " + jobID);
@@ -147,7 +147,7 @@ public class Submitter extends Thread {
 		for (FileDetails fd : fDs) {
 			PreparedStatement statement = null;
 			try {
-				String SQL_INSERT = "INSERT INTO SSS_FILES (JOBID, NAME, FILESIZE, EVENTS) values (?,?,?,?)";
+				String SQL_INSERT = "INSERT INTO ATLAS_WANHCTEST.SSS_FILES (JOBID, NAME, FILESIZE, EVENTS) values (?,?,?,?)";
 				statement = conn.prepareStatement(SQL_INSERT);
 				statement.setInt(1, jobID);
 				statement.setString(2, fd.fName);
@@ -168,7 +168,7 @@ public class Submitter extends Thread {
 			// now setting status to 0 so job is taken by SSSexecutor -
 			// initially trigger sets status to -1
 			try {
-				String SQL_UPDATE_STATUS = "update SSS_JOBS set status=0 where jobid=?";
+				String SQL_UPDATE_STATUS = "update ATLAS_WANHCTEST.SSS_JOBS set status=0 where jobid=?";
 				statement = conn.prepareStatement(SQL_UPDATE_STATUS);
 				statement.setInt(1, jobID);
 				statement.executeUpdate();
