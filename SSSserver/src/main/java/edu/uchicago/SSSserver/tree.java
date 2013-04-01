@@ -80,8 +80,11 @@ public class tree {
 		// logger.debug("Adding branches. ");
 		for (Map.Entry<String, Long> br : m_branches.entrySet()) {
 			Long ntbs = treeToAdd.getBranchSize(br.getKey());
+			if (br.getKey().equals("vxp_z")) 
+				logger.info("vxp_z size to ADD: "+ntbs.toString() + "prev: "+br.getValue().toString());
 			if (ntbs != null) {
-				br.setValue(br.getValue() + ntbs);
+				Long prevSize=br.getValue();
+				br.setValue(prevSize + ntbs);
 			}
 			// else
 			// logger.debug("branch: "+br.getKey()+" is missing from one of the files.");
