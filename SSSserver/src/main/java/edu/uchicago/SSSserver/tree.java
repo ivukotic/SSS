@@ -77,7 +77,7 @@ public class tree {
 		events += treeToAdd.getEvents();
 		size += treeToAdd.getSize();
 
-		// logger.debug("Adding branches. ");
+		 logger.info("Adding branches. ");
 		for (Map.Entry<String, Long> br : m_branches.entrySet()) {
 			Long ntbs = treeToAdd.getBranchSize(br.getKey());
 			if (br.getKey().equals("vxp_z")) 
