@@ -50,7 +50,7 @@ public class Receiver {
 		}
 
 		try {
-			cs = conn.prepareCall("{call SSS_SET_TASK()}");
+			cs = conn.prepareCall("{call ATLAS_WANHCTEST.SSS_SET_TASK()}");
 		} catch (SQLException e) {
 			logger.error("can't create statement SSS_SET_TASK()" + e.getMessage());
 		}
@@ -67,7 +67,7 @@ public class Receiver {
 			// cs.close();
 
 			logger.debug("Tasks were set");
-			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK(?,?,?,?,?,?,?,?,?)}");
+			CallableStatement cs1 = conn.prepareCall("{call ATLAS_WANHCTEST.SSS_GET_TASK(?,?,?,?,?,?,?,?,?)}");
 			cs1.registerOutParameter(1, Types.INTEGER);
 			cs1.registerOutParameter(2, Types.INTEGER);
 			cs1.registerOutParameter(3, Types.VARCHAR);
@@ -98,7 +98,7 @@ public class Receiver {
 
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT name from SSS_FILES where taskid=" + task.id.toString());
+			ResultSet rs = stmt.executeQuery("SELECT name from ATLAS_WANHCTEST.SSS_FILES where taskid=" + task.id.toString());
 			while (rs.next()) {
 				task.inputFiles.add(rs.getString(1));
 			}
@@ -117,7 +117,7 @@ public class Receiver {
 	public void setQID(Integer tid, Integer qid){
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("UPDATE SSS_SUBJOBS SET queueID="+qid.toString()+" where taskid=" + tid.toString());
+			ResultSet rs = stmt.executeQuery("UPDATE ATLAS_WANHCTEST.SSS_SUBJOBS SET queueID="+qid.toString()+" where taskid=" + tid.toString());
 			rs.close();
 			stmt.close();
 		} catch (SQLException sqle) {
@@ -135,7 +135,7 @@ public class Receiver {
 
 
 			logger.debug("Tasks were set");
-			CallableStatement cs1 = conn.prepareCall("{call SSS_GET_TASK_TO_KILL(?,?,?)}");
+			CallableStatement cs1 = conn.prepareCall("{call ATLAS_WANHCTEST.SSS_GET_TASK_TO_KILL(?,?,?)}");
 			cs1.registerOutParameter(1, Types.INTEGER);
 			cs1.registerOutParameter(2, Types.INTEGER);
 			cs1.registerOutParameter(3, Types.VARCHAR);
