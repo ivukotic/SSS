@@ -419,7 +419,7 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
             print 'Executing SSS_FINISH_FILE.'
             connection1 = cx_Oracle.Connection(connline)
             cursor = cx_Oracle.Cursor(connection1)
-            cursor.execute("update sss_subjobs set outputevents="+str(n_pass)+", eventsprocessed=eventsprocessed+"+str(nentries)+" where taskid="+str(taskid) )
+            cursor.execute("update ATLAS_WANHCTEST.SSS_SUBJOBS set outputevents="+str(n_pass)+", eventsprocessed=eventsprocessed+"+str(nentries)+" where taskid="+str(taskid) )
             cursor.close()
             connection1.commit()
             connection1.close()
@@ -700,7 +700,7 @@ Accepted command line options:
         jobid=int(getjt[0])
         taskid=int(getjt[1])
         machine=socket.gethostname()
-        cursor.callproc("SSS_START_TASK", [taskid, machine])
+        cursor.callproc("ATLAS_WANHCTEST.SSS_START_TASK", [taskid, machine])
         cursor.close()
         
     except cx_Oracle.DatabaseError, exc:
@@ -801,7 +801,7 @@ Accepted command line options:
         print 'executing SSS_FINISH_TASK.'
         connection2 = cx_Oracle.Connection(connline)
         cursor = cx_Oracle.Cursor(connection2)
-        cursor.callproc("SSS_FINISH_TASK", [taskid, 4, timer.CpuTime()/timer.RealTime()])
+        cursor.callproc("ATLAS_WANHCTEST.SSS_FINISH_TASK", [taskid, 4, timer.CpuTime()/timer.RealTime()])
         cursor.close()
         connection2.commit()
         connection2.close()
@@ -854,7 +854,7 @@ Accepted command line options:
         print 'Final DB update .'
         connection3 = cx_Oracle.Connection(connline)
         cursor = cx_Oracle.Cursor(connection3)
-        cursor.execute("update sss_subjobs set status=5, outputsize="+str(fsize)+" where taskid="+str(taskid) )
+        cursor.execute("update ATLAS_WANHCTEST.SSS_SUBJOBS set status=5, outputsize="+str(fsize)+" where taskid="+str(taskid) )
         cursor.close()
         connection3.commit()
         connection3.close()
