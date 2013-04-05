@@ -238,7 +238,7 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
         f.Close()
         del f
         pass # loop over trees
-
+        
     while 1: # recursive optimization
         tot_mem = sum(basket_sz)
         if tot_mem < memory:
@@ -831,7 +831,7 @@ Accepted command line options:
     fsize=0
     try:
         fsize=os.path.getsize(opts.output_file)
-        print 'file '+opts.output_file+'is  there. Its size: '+str(fsize)
+        print 'file '+opts.output_file+' is  there. Its size: '+str(fsize)
     except os.error:
         print 'file is not there or not accessible'
         

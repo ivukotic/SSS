@@ -99,16 +99,18 @@ public class Task {
 			res += "export X509_USER_PROXY=x509up_u20074\n";
 			res += "source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --dq2ClientVersion current --skipConfirm\n";
 			res += "export DQ2_LOCAL_SITE_ID=MWT2_UC_USERDISK\n";
-			res += "python filter-and-merge-d3pd.py ";
-			res += " --in=" + fn + "inputFileList";
-			res += " --outDS=" + dataset;
-			res += " --out=" + outFile;
-			res += " --tree=" + tree;
-			res += " --var=" + fn + "branchesList";
-			if (cut != null)
-				res += " --selection=file:" + fn + "cutCode";
-			if (treesToCopy != null)
-				res += " --keep-all-trees";
+//			res += "python filter-and-merge-d3pd.py ";
+//			res += " --in=" + fn + "inputFileList";
+//			res += " --outDS=" + dataset;
+//			res += " --out=" + outFile;
+//			res += " --tree=" + tree;
+//			res += " --var=" + fn + "branchesList";
+//			if (cut != null)
+//				res += " --selection=file:" + fn + "cutCode";
+//			if (treesToCopy != null)
+//				res += " --keep-all-trees";
+			res += "xrdcp -f -np "+fn+" /dev/null";
+			
 			out.write(res);
 			out.close();
 		} catch (Exception ex) {
