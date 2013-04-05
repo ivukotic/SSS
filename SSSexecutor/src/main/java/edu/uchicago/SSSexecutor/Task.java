@@ -109,7 +109,13 @@ public class Task {
 //				res += " --selection=file:" + fn + "cutCode";
 //			if (treesToCopy != null)
 //				res += " --keep-all-trees";
-			res += "xrdcp -f -np "+fn+" /dev/null";
+			
+			for (String s : inputFiles) {
+				if (redi != null)
+					s = s.replaceFirst("root://glrd.usatlas.org/", redi);
+				res += "time xrdcp -f -np "+s+" /dev/null;";
+			}
+			
 			
 			out.write(res);
 			out.close();
