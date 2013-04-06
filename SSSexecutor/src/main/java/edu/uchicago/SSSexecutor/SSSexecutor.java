@@ -71,7 +71,7 @@ public class SSSexecutor {
 			
 			boolean wait=true;
 			// first check number of idle jobs for this user
-			if (getNumberOfIdleJobs() < 2000) {
+			if (getNumberOfIdleJobs() < 2) {
 
 				Task task = r.getJob();
 				if (task.id > 0) {
