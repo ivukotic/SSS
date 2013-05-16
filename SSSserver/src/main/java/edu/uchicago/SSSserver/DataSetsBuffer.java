@@ -2,12 +2,11 @@ package edu.uchicago.SSSserver;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class DataSetsBuffer {
 
-	final Logger logger = LoggerFactory.getLogger(DataSetsBuffer.class);
+	final private static Logger logger = Logger.getLogger(DataSetsBuffer.class);
 
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
     private ArrayList<Response> responses = new ArrayList<Response>();

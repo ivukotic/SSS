@@ -3,12 +3,11 @@ package edu.uchicago.SSSserver;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class tree {
 
-	final Logger logger = LoggerFactory.getLogger(tree.class);
+	final private static Logger logger = Logger.getLogger(tree.class);
 
 	private String name = "";
 	private Long events;

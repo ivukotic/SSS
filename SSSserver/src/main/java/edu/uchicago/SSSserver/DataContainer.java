@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class DataContainer {
 
-	final Logger logger = LoggerFactory.getLogger(DataContainer.class);
+	final private static Logger logger = Logger.getLogger(DataContainer.class);
 
 	private ArrayList<Dataset> dSets = new ArrayList<Dataset>();
 

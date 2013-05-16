@@ -5,12 +5,11 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class CondorSubmitter implements Submitter {
 
-	final Logger logger = LoggerFactory.getLogger(CondorSubmitter.class);
+	final private static Logger logger = Logger.getLogger(CondorSubmitter.class);
 
 	public Integer submit(Task task) {
 
@@ -27,7 +26,7 @@ public class CondorSubmitter implements Submitter {
 			res += "output         = " + fn + "out\n";
 			res += "error          = " + fn + "error\n";
 			res += "log            = " + fn + "log\n";
-			String filesToTransfer = "filter-and-merge-d3pd.py,.OracleAccess.txt,";
+			String filesToTransfer = "filter-and-merge-d3pd.py,.OracleAccess.txt,.rootrc,";
 			filesToTransfer += "/tmp/x509up_u20074,";
 			filesToTransfer += fn+"inputFileList,";
 			filesToTransfer += fn+"branchesList";

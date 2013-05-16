@@ -3,12 +3,12 @@ package edu.uchicago.SSSserver;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class Response extends Thread {
 
-	final static Logger logger = LoggerFactory.getLogger(Response.class);
+	final private static Logger logger = Logger.getLogger(Response.class);
+
 	public String md5;
 	private StringBuilder buf = new StringBuilder();
 	// stage starts with 0

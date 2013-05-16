@@ -5,12 +5,11 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class Task {
 
-	final Logger logger = LoggerFactory.getLogger(Task.class);
+	final private static Logger logger = Logger.getLogger(Task.class);
 
 	public Integer id = 0;
 	public Integer jID=0;

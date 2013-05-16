@@ -6,52 +6,32 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.axis2.AxisFault;
+import condor.CondorScheddStub;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public class SSSexecutor {
 
-	final static Logger logger = LoggerFactory.getLogger(SSSexecutor.class);
+	final private static Logger logger = Logger.getLogger(SSSexecutor.class);
 
-	private static Integer getNumberOfIdleJobs() {
-		Integer idlejobs = 0;
-		Runtime rt = Runtime.getRuntime();
-		String[] comm = { "/bin/sh", "-c", "condor_q " + System.getProperty("user.name") + " | grep \" I \" | wc -l" };
-
-		try {
-			Process proc = rt.exec(comm);
-
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-			BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-
-			// read the output from the submit command
-			String s = stdInput.readLine();
-			logger.info("idle jobs: " + s);
-			idlejobs = Integer.parseInt(s);
-
-			// read any errors from the submit command
-			while ((s = stdError.readLine()) != null) {
-				logger.error("there is an error from command lookign for idle jobs...");
-				logger.error(s);
-			}
-
-		} catch (Exception ex) {
-			logger.error(ex.getMessage());
-		}
-		return idlejobs;
+	SSSexecutor(){
+		PropertyConfigurator.configure(SSSexecutor.class.getClassLoader().getResource("log4j.properties"));
 	}
-
-	public static void waitAminute() {
-		try {
-			logger.info("----------------");
-			Thread.currentThread().sleep(30000);
-		} catch (Exception e) {
-		}
-	}
-
-	public static void main(String[] args) {
+	
+	private void start(){
 		logger.info("starting up ...");
+		logger.info("making schedduler");
+		
 
+		try {
+			CondorScheddStub sch=new CondorScheddStub();
+		} catch (AxisFault e) {
+			logger.warn("could not make schedduler");
+			e.printStackTrace();
+		}
+		
 		try { // write process number so shell can restart it if it crashes.
 			FileWriter fstream = new FileWriter("/tmp/.SSSexecutor.proc");
 			BufferedWriter out = new BufferedWriter(fstream);
@@ -94,6 +74,50 @@ public class SSSexecutor {
 			if (wait==true)
 				waitAminute();
 		}
+		
+	}
+	
+	private static Integer getNumberOfIdleJobs() {
+		Integer idlejobs = 0;
+		Runtime rt = Runtime.getRuntime();
+		String[] comm = { "/bin/sh", "-c", "condor_q " + System.getProperty("user.name") + " | grep \" I \" | wc -l" };
+
+		try {
+			Process proc = rt.exec(comm);
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+
+			// read the output from the submit command
+			String s = stdInput.readLine();
+			logger.info("idle jobs: " + s);
+			idlejobs = Integer.parseInt(s);
+
+			// read any errors from the submit command
+			while ((s = stdError.readLine()) != null) {
+				logger.error("there is an error from command lookign for idle jobs...");
+				logger.error(s);
+			}
+
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		return idlejobs;
+	}
+
+	public static void waitAminute() {
+		try {
+			logger.info("----------------");
+			Thread.currentThread().sleep(30000);
+		} catch (Exception e) {
+		}
+	}
+
+	public static void main(String[] args) {
+		
+		SSSexecutor SSSe=new SSSexecutor();
+		SSSe.start();
+		
 
 	}
 

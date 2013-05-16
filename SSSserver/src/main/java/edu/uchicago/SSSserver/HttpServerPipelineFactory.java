@@ -2,19 +2,18 @@ package edu.uchicago.SSSserver;
 
 import static org.jboss.netty.channel.Channels.*;
 
-import java.util.ArrayList;
-
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.log4j.Logger;
+
 
 public class HttpServerPipelineFactory implements ChannelPipelineFactory {
 
-	final static Logger logger = LoggerFactory.getLogger(HttpServerPipelineFactory.class);
+	final private static Logger logger = Logger.getLogger(HttpServerPipelineFactory.class);
 
     DataSetsBuffer DSB=new DataSetsBuffer();
     

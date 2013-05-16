@@ -24,12 +24,13 @@ import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.util.CharsetUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.log4j.Logger;
 
 public class HttpRequestHandler extends SimpleChannelUpstreamHandler {
 
-	final Logger logger = LoggerFactory.getLogger(HttpRequestHandler.class);
+	final private static Logger logger = Logger.getLogger(HttpRequestHandler.class);
+	
 	private HttpRequest request;
 	private boolean readingChunks;
 	/** Buffer that stores the response content */

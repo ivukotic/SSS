@@ -8,12 +8,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class Submitter extends Thread {
 
-	final Logger logger = LoggerFactory.getLogger(Submitter.class);
+	final private static Logger logger = Logger.getLogger(Submitter.class);
 
 	private Connection conn;
 	private final String dbhost = "intr1-v.cern.ch:10121/intr.cern.ch";
