@@ -3,8 +3,8 @@ export HOME=/home/ivukotic
 export dbusername=...
 export dbpass=...
 
-source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
-source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --skipConfirm --dq2ClientVersion current
+source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet
+source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalDQ2ClientSetup.sh --quiet --skipConfirm --dq2ClientVersion current
 
 voms-proxy-init -cert $HOME/.globus/usercert.pem -key $HOME/.globus/userkey.pem -voms atlas -valid 96:0 -pwstdin < $HOME/gridlozinka.txt
 
@@ -25,7 +25,7 @@ then
 fi    
 
 echo "file /tmp/.SSSserver.proc not found. starting SSSserver. "
-source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --rootVersion current
+source ${ATLAS_LOCAL_ROOT_BASE}/packageSetups/atlasLocalROOTSetup.sh --quiet --rootVersion current
 cd ~/SSS/SSSserver
 export STORAGEPREFIX=root://glrd.usatlas.org/
 make

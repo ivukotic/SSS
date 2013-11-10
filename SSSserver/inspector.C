@@ -71,7 +71,7 @@ int main(int argc, char **argv){
             if (!exist) m_trees.push_back(mTree(tree));
         }
     }
-    cout<<m_trees.size()<<endl;
+    cout<<"ntrees:"<<m_trees.size()<<endl;
     for (vector<mTree>::iterator it = m_trees.begin();it != m_trees.end(); it++)
         it->print();
 f->Close();        

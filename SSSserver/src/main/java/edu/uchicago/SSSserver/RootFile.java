@@ -51,6 +51,7 @@ public class RootFile {
 	public String getFullgLFN(){
 		return gLFN+"/"+name;
 	}
+	
 	private class Inspector extends Thread {
 
 		public void run() {
@@ -64,18 +65,23 @@ public class RootFile {
 				Process pr = rt.exec(comm);
 				BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 
-				String line = null;
-				line = input.readLine();
-				logger.debug(line);
-				if (line == null) {
-					logger.error("problem: should have returned number of trees in file. nothing returned.");
+				String line;
+				Integer nt=-1;
+				while ((line = input.readLine()) != null) {
+					logger.debug(line);
+					if (line.startsWith("ntrees:")) {
+						nt=Integer.parseInt(line.substring(7));
+						break;
+					}
+				}
+				if (nt==-1){
+					logger.error("problem: should have returned number of trees in file.");
 					started=false;
 					return;
 				} else {
-					int nt = Integer.parseInt(line.trim());
 					for (int i = 0; i < nt; i++) {
 						line = input.readLine();
-//						logger.debug(line);
+						logger.debug(line);
 						String[] parts = line.split(":");
 						if (parts.length != 4) {
 							logger.error("problem in getting tree name, size, events");
@@ -108,6 +114,8 @@ public class RootFile {
 
 			} catch (Exception e) {
 				logger.error("unrecognized exception: " + e.getMessage());
+				logger.error(e.toString());
+				e.printStackTrace();
 				started = false;
 				done = false;
 			}
