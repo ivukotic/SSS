@@ -16,7 +16,9 @@ import PyCintex
 print 'enabling pycintex'
 PyCintex.Cintex.Enable()
 
-import cx_Oracle
+import urllib2
+from urllib import urlencode
+
 import socket
 import subprocess
 
@@ -26,28 +28,9 @@ _root_trees = []
 
 taskid=0
 jobid=0
-connline=''
 
-print 'reading connection parameters'
-with open('.OracleAccess.txt', 'r') as f: 
-    lines=f.readlines()
-    for connline in lines:
-        if 'ATLAS_WANHCTEST' in connline:
-            break
-    f.close()
+u = "http://ivukotic.web.cern.ch/ivukotic/SSS/wnToDB.asp"    
 
-print 'opening connection'
-connection=None
-try:
-    connection = cx_Oracle.Connection(connline)
-except cx_Oracle.DatabaseError, exc:
-    error, = exc.args
-    print "filter-and-merge.py - problem in establishing connection to db"
-    print "filter-and-merge.py Oracle-Error-Code:", error.code
-    print "filter-and-merge.py Oracle-Error-Message:", error.message
-
-print 'connection opened'
-    
 # Root has a global dtor ordering problem: the cintex trampolines
 # may be deleted before open files are closed.  Workaround is to explicitly
 # close open files before terminating.
@@ -417,17 +400,16 @@ def merge_all_trees(fnames, tree_name, memory, sfo,
         
         try:
             print 'Executing SSS_FINISH_FILE.'
-            connection1 = cx_Oracle.Connection(connline)
-            cursor = cx_Oracle.Cursor(connection1)
-            cursor.execute("update ATLAS_WANHCTEST.SSS_SUBJOBS set outputevents="+str(n_pass)+", eventsprocessed=eventsprocessed+"+str(nentries)+" where taskid="+str(taskid) )
-            cursor.close()
-            connection1.commit()
-            connection1.close()
-        except cx_Oracle.DatabaseError, exc:
-            error, = exc.args
-            print "filter-and-merge.py - problem in executing SSS_FINISH_FILE"
-            print "filter-and-merge.py Oracle-Error-Code:", error.code
-            print "filter-and-merge.py Oracle-Error-Message:", error.message
+            data = dict(Method="SSS_FINISH_FILE", Task=taskid, EventsPassed=n_pass, EventsProcessed=nentries)
+            req = urllib2.Request(u, urlencode(data))
+            resp = urllib2.urlopen(req)
+            print resp.read()
+        except urllib2.HTTPError as e:
+            print 'The server couldn\'t fulfill the request.'
+            print 'Error code: ', e.code
+        except urllib2.URLError as e:
+            print 'We failed to reach a server.'
+            print 'Reason: ', e.reason
         
         pass # loop over input trees
         
@@ -694,20 +676,23 @@ Accepted command line options:
     global jobid
     try:
         print 'Executing SSS_START_TASK.'
-        cursor = cx_Oracle.Cursor(connection)
+        
         getjt=opts.output_file.replace('SSS_NTUP_','').replace('.root','')
         getjt=getjt.split('_')
         jobid=int(getjt[0])
         taskid=int(getjt[1])
         machine=socket.gethostname()
-        cursor.callproc("ATLAS_WANHCTEST.SSS_START_TASK", [taskid, machine])
-        cursor.close()
-        
-    except cx_Oracle.DatabaseError, exc:
-        error, = exc.args
-        print "filter-and-merge.py - problem in executing SSS_START_TASK"
-        print "filter-and-merge.py Oracle-Error-Code:", error.code
-        print "filter-and-merge.py Oracle-Error-Message:", error.message
+
+        data = dict(Method="SSS_START_TASK", Task=taskid, Machine=machine)
+        req = urllib2.Request(u,      urlencode(data))
+        resp = urllib2.urlopen(req)
+        print resp.read()
+    except urllib2.HTTPError as e:
+        print 'The server couldn\'t fulfill the request.'
+        print 'Error code: ', e.code
+    except urllib2.URLError as e:
+        print 'We failed to reach a server.'
+        print 'Reason: ', e.reason
 
     # ***************************************************************************************
     
@@ -799,17 +784,16 @@ Accepted command line options:
 
     try:
         print 'executing SSS_FINISH_TASK.'
-        connection2 = cx_Oracle.Connection(connline)
-        cursor = cx_Oracle.Cursor(connection2)
-        cursor.callproc("ATLAS_WANHCTEST.SSS_FINISH_TASK", [taskid, 4, timer.CpuTime()/timer.RealTime()])
-        cursor.close()
-        connection2.commit()
-        connection2.close()
-    except cx_Oracle.DatabaseError, exc:
-        error, = exc.args
-        print "filter-and-merge.py - problem in executing SSS_FINISH_TASK."
-        print "filter-and-merge.py Oracle-Error-Code:", error.code
-        print "filter-and-merge.py Oracle-Error-Message:", error.message
+        data = dict(Method="SSS_FINISH_TASK", Task=taskid, CPUeff=timer.CpuTime()/timer.RealTime())
+        req = urllib2.Request(u,      urlencode(data))
+        resp = urllib2.urlopen(req)
+        print resp.read()
+    except urllib2.HTTPError as e:
+        print 'The server couldn\'t fulfill the request.'
+        print 'Error code: ', e.code
+    except urllib2.URLError as e:
+        print 'We failed to reach a server.'
+        print 'Reason: ', e.reason
 
 
 
@@ -852,17 +836,16 @@ Accepted command line options:
     print "udpating Oracle db"
     try:
         print 'Final DB update .'
-        connection3 = cx_Oracle.Connection(connline)
-        cursor = cx_Oracle.Cursor(connection3)
-        cursor.execute("update ATLAS_WANHCTEST.SSS_SUBJOBS set status=5, outputsize="+str(fsize)+" where taskid="+str(taskid) )
-        cursor.close()
-        connection3.commit()
-        connection3.close()
-    except cx_Oracle.DatabaseError, exc:
-        error, = exc.args
-        print "filter-and-merge.py - problem in Final DB update"
-        print "filter-and-merge.py Oracle-Error-Code:", error.code
-        print "filter-and-merge.py Oracle-Error-Message:", error.message    
+        data = dict(Method="SSS_FINALE", Task=taskid, OutputSize=fsize)
+        req = urllib2.Request(u,      urlencode(data))
+        resp = urllib2.urlopen(req)
+        print resp.read()
+    except urllib2.HTTPError as e:
+        print 'The server couldn\'t fulfill the request.'
+        print 'Error code: ', e.code
+    except urllib2.URLError as e:
+        print 'We failed to reach a server.'
+        print 'Reason: ', e.reason   
     
     
     print "::: bye."
